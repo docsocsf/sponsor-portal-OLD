@@ -1,0 +1,4 @@
+package: github.com/docsocsf/sponsor-portal
+import:
+- package: github.com/caarlos0/env
+  version: ^3.0.0
