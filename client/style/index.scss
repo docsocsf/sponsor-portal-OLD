@@ -1,0 +1,14 @@
+@import 'common';
+@import 'colors';
+@import 'buttons';
+
+#login {
+  text-align: center;
+
+  .student {
+    background: lighten($background, 10);
+    a {
+      color: whitesmoke;
+    }
+  }
+}

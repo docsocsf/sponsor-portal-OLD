@@ -1,13 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import '../style/main.scss';
+import '../style/index.scss';
+import Home from 'Views/Home';
 
-class HelloWorld extends React.Component {
-  render() {
-    return (
-      <h1>Hello, World!</h1>
-    );
-  }
-}
-
-ReactDOM.render(<HelloWorld/>, document.getElementById("main"));
+ReactDOM.render(<Home/>, document.getElementById("main"));
