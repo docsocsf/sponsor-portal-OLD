@@ -1,6 +1,63 @@
 hash: b2be70df2d6ff649508bada1d497832e448bbc09dbdde4a68261c7d96bc20fac
-updated: 2017-07-03T21:05:27.8678271+01:00
+updated: 2017-07-12T19:13:25.651313397+01:00
 imports:
+- name: cloud.google.com/go
+  version: d2bf9ead8d595b9347434a2bcbaec6395862adab
+  subpackages:
+  - compute/metadata
 - name: github.com/caarlos0/env
   version: 0cf029d5748c52beb2c9d20c81880cb4bdf8f788
+- name: github.com/golang/protobuf
+  version: 5a0f697c9ed9d68fef0116532c6e05cfeae00e55
+  subpackages:
+  - proto
+- name: github.com/gorilla/context
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+- name: github.com/gorilla/handlers
+  version: a4d79d4487c2430a17d9dc8a1f74d1a6ed6908ca
+- name: github.com/gorilla/mux
+  version: bcd8bc72b08df0f70df986b97f95590779502d31
+- name: github.com/gorilla/securecookie
+  version: e59506cc896acb7f7bf732d4fdf5e25f7ccd8983
+- name: github.com/gorilla/sessions
+  version: ca9ada44574153444b00d3fd9c8559e4cc95f896
+- name: github.com/joho/godotenv
+  version: 3ddb2792f3923947290c4932990136e17852a078
+  subpackages:
+  - autoload
+- name: github.com/lib/pq
+  version: ba5d4f7a35561e22fbdf7a39aa0070f4d460cfc0
+  subpackages:
+  - oid
+- name: golang.org/x/net
+  version: 59a0b19b5533c7977ddeb86b017bf507ed407b12
+  subpackages:
+  - context
+  - context/ctxhttp
+- name: golang.org/x/oauth2
+  version: f047394b6d14284165300fd82dad67edb3a4d7f6
+  subpackages:
+  - google
+  - internal
+  - jws
+  - jwt
+- name: google.golang.org/api
+  version: e665075b5ff79143ba49c58fab02df9dc122afd5
+  subpackages:
+  - gensupport
+  - googleapi
+  - googleapi/internal/uritemplates
+  - oauth2/v2
+- name: google.golang.org/appengine
+  version: a2f4131514e563cedfdb6e7d267df9ad48591e93
+  subpackages:
+  - internal
+  - internal/app_identity
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/modules
+  - internal/remote_api
+  - internal/urlfetch
+  - urlfetch
 testImports: []

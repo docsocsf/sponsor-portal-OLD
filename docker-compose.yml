@@ -1,0 +1,13 @@
+version: '2'
+services:
+  sponsor_portal_db:
+    image: postgres:9.6.2
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+      - PGPASSWORD=${PGPASSWORD}
+    expose:
+      - ${DB_PORT}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
