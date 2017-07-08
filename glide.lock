@@ -1,0 +1,6 @@
+hash: b2be70df2d6ff649508bada1d497832e448bbc09dbdde4a68261c7d96bc20fac
+updated: 2017-07-03T21:05:27.8678271+01:00
+imports:
+- name: github.com/caarlos0/env
+  version: 0cf029d5748c52beb2c9d20c81880cb4bdf8f788
+testImports: []

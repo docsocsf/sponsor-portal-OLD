@@ -9,9 +9,17 @@
  - yarn
 
 ## Build & Run
- - TBC
+ - `make install` to install npm and go packages
+
+ - `make client` to build the front-end assets for development and watch for changes (recommended)
+ - `make build:dev` to build the front-end assets for development
+ - `make build` to build the front-end assets for production
+
+ - `make server` to start the go server
 
 ---
+
+_I'll turn these into issues when they are more concrete_
 
 ### TODOs (packages):
  - web: main entrypoint for the server, sets up auth, routes and index page
