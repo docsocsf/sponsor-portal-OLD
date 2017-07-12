@@ -30,6 +30,7 @@ Sponsors can:
 * View CVs
 * Reach out to students (if the student has given permission)
 * Manage their profile page, i.e. logo, description, contact details, application details, what they are looking for, roles they are advertising
+
 Students can:
 * Insert all details which companies require so that they don’t have to fill any other forms
 * Exactly which fields is up for discussion
