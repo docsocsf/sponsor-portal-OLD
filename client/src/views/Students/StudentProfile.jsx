@@ -5,14 +5,19 @@ export default class StudentProfile extends React.Component {
     super()
 
     this.state = {}
+    this.getUser = this.getUser.bind(this);
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    this.getUser()
+  }
+
+  async getUser() {
     try {
       const user = await this.props.fetchUser()
       this.setState({user})
     } catch (e) {
-      console.log(e)
+      console.log("fetch user", e)
     }
   }
 

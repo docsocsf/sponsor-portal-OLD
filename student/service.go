@@ -11,13 +11,17 @@ import (
 )
 
 type Service struct {
+	staticFiles string
+
 	router http.Handler
 	Auth   *auth.Auth
 	model.UserReader
 }
 
-func New(authConfig *auth.Config) (*Service, error) {
-	service := Service{}
+func New(authConfig *auth.Config, staticFiles string) (*Service, error) {
+	service := Service{
+		staticFiles: staticFiles,
+	}
 
 	if err := service.setupAuth(authConfig); err != nil {
 		return nil, err

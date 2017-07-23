@@ -15,4 +15,7 @@ type Config struct {
 	SuccessHandler    http.Handler
 	FailureHandler    http.Handler
 	PostLogoutHandler http.Handler
+
+	JwtSecret []byte
+	JwtIssuer string
 }

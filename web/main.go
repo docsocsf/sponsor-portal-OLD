@@ -9,13 +9,13 @@ import (
 )
 
 func main() {
-	student := makeStudentService()
 
 	host, err := config.GetHost()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	student := makeStudentService(host.StaticFiles)
 	http.Handle("/students/", http.StripPrefix("/students", student.Handler()))
 
 	root := http.FileServer(http.Dir(host.StaticFiles))

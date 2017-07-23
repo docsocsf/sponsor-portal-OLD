@@ -2,3 +2,8 @@ package: github.com/docsocsf/sponsor-portal
 import:
 - package: github.com/caarlos0/env
   version: ^3.0.0
+- package: github.com/dgrijalva/jwt-go
+  version: ^3.0.0
+- package: github.com/gorilla/mux
+  version: ^1.4.0
+- package: google.golang.org/api

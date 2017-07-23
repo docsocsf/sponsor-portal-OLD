@@ -8,13 +8,13 @@ import (
 )
 
 type User struct {
-	Id   int64
-	Name string
-	Auth UserAuth
+	Id   int64     `json:"id"`
+	Name string    `json:"name"`
+	Auth *UserAuth `json:"auth,omitempty"`
 }
 
 type UserAuth struct {
-	Email string
+	Email string `json:"email,omitempty"`
 }
 
 type UserReader interface {
@@ -41,7 +41,7 @@ func NewUserReader(db *sql.DB) UserReader {
 }
 
 func (u userImpl) GetById(id auth.UserIdentifier) (User, error) {
-	user := User{Auth: UserAuth{}}
+	user := User{Auth: &UserAuth{}}
 	err := u.db.QueryRow(getUserById, id).Scan(&user.Id, &user.Name, &user.Auth.Email)
 
 	switch {

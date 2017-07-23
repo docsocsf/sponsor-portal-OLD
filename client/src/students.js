@@ -2,21 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import '../style/students.scss';
 import Students from 'Views/Students';
-
-const defaultConfig = {
-  method: 'GET',
-  headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-  },
-  credentials: 'same-origin',
-};
-
-const fetchWithConfig = (url, configOverrides) => {
-  const config = Object.assign({}, defaultConfig, configOverrides);
-
-  return fetch(url, config);
-}
+import fetchWithConfig from './fetch';
+import memoize from 'promise-memoize';
 
 const getJWTHeader = async (hdr) => {
   const token = await getToken();
@@ -26,13 +13,11 @@ const getJWTHeader = async (hdr) => {
   return headers;
 }
 
-const getToken = async () => {
-  const response = await fetch("/students/auth/jwt/token", {
-    credentials: 'same-origin',
-  });
+const getToken = memoize(async () => {
+  const response = await fetchWithConfig("/students/auth/jwt/token");
 
   return response.text();
-}
+}, {maxAge: 60000});
 
 const fetchUser = async () => {
   const headers = await getJWTHeader();

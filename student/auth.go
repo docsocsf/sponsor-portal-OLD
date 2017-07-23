@@ -31,7 +31,7 @@ func (s *Service) setupAuth(config *auth.Config) (err error) {
 func (s *Service) authHandler(info auth.UserInfo) (auth.UserIdentifier, error) {
 	userModel := model.User{
 		Name: info.Name,
-		Auth: model.UserAuth{
+		Auth: &model.UserAuth{
 			Email: info.Email,
 		},
 	}
