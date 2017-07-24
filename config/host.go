@@ -9,9 +9,8 @@ type HostConfig struct {
 	StaticFiles string `env:"STATIC_FILES,required"`
 }
 
-func GetHost() (HostConfig, error) {
-	var host HostConfig
-	err := env.Parse(&host)
+func GetHost() (host HostConfig, err error) {
+	err = env.Parse(&host)
 	host.Port = ":" + host.Port
-	return host, err
+	return
 }
