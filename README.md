@@ -2,11 +2,11 @@
 
 ## Dependencies
  - Go 1.8+
- - Glide
- - Migrate
+ - [Glide](https://github.com/Masterminds/glide#install)
+ - [Migrate](https://github.com/mattes/migrate#cli-usage)
  - Docker
  - npm
- - yarn
+ - [yarn](https://yarnpkg.com/en/docs/install)
 
 ## Build & Run
  - `make install` to install npm and go packages
