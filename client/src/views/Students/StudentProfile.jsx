@@ -1,4 +1,5 @@
 import React from 'react';
+import FileUploadDialog from 'Components/FileUploadDialog';
 
 export default class StudentProfile extends React.Component {
   constructor() {
@@ -29,6 +30,10 @@ export default class StudentProfile extends React.Component {
             Hello, {this.state.user ? this.state.user.name : "Student"}!
           </h1>
         </header>
+        <section id="cv">
+          <h2>Upload CV</h2>
+          <FileUploadDialog accept="application/pdf" className="cv" multiple={false}/>
+        </section>
       </div>
     );
   }
