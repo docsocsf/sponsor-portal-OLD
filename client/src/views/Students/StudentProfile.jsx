@@ -1,5 +1,11 @@
 import React from 'react';
 import FileUploadDialog from 'Components/FileUploadDialog';
+import request from 'superagent';
+import config from './mock-config';
+import mocker from 'superagent-mock';
+
+const logger = log => console.log("mock", log);
+const mock = mocker(request, config, logger);
 
 export default class StudentProfile extends React.Component {
   constructor() {
@@ -22,6 +28,21 @@ export default class StudentProfile extends React.Component {
     }
   }
 
+  async uploadCV(files, progress) {
+    if (files.length > 1) {
+      throw new Error("Expecting exactly 1 CV")
+    }
+
+    console.log(config[0].post.toString());
+
+    let data = await request
+      .post('/cv')
+      .attach('cv', files[0]).
+      on('progress', event => {
+        progress(event.percent);
+      });
+  }
+
   render() {
     return (
       <div>
@@ -32,7 +53,12 @@ export default class StudentProfile extends React.Component {
         </header>
         <section id="cv">
           <h2>Upload CV</h2>
-          <FileUploadDialog accept="application/pdf" className="cv" multiple={false}/>
+          <FileUploadDialog
+            accept="application/pdf"
+            className="cv"
+            multiple={false}
+            onUpload={this.uploadCV}
+          />
         </section>
       </div>
     );

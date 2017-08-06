@@ -29,6 +29,10 @@ section#cv {
       border-color: #009900;
     }
 
+    &.loading {
+      border-color: #000099;
+    }
+
     &.reject {
       border-color: #990000;
 
@@ -40,5 +44,8 @@ section#cv {
     &.empty {
       border-color: $grey;
     }
+  }
+
+  progress {
   }
 }
