@@ -13,7 +13,7 @@ setupdb:
 
 SEED_CMD := "psql -U ${DB_USER} -d ${DB_NAME} -c \"COPY users (name, email) FROM STDIN WITH CSV\""
 seed:
-	docker exec -i $$(docker-compose ps -q sponsor_portal_db) sh -c ${SEED_CMD} < seed/users.csv
+	docker exec -i $$(docker-compose ps -q db) sh -c ${SEED_CMD} < seed/users.csv
 
 setup: install setupdb seed
 
