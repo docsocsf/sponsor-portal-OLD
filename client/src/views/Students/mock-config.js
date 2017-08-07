@@ -3,7 +3,7 @@ export default [
     pattern: '(.*)',
 
     fixtures: function (match, params, headers, context) {
-      if (match[1] === '/cv') {
+      if (match[1] === '/students/api/cv') {
         context.progress = {
           parts: 50,
           delay: 40,

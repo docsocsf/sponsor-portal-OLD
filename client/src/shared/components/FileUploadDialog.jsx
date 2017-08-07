@@ -27,10 +27,14 @@ export default class FileUploadDialog extends React.Component {
           this.setState({percent}));
         this.setState({...initialState, files: accepted})
       } catch (e) {
-        this.setState({...initialState, errors: rejected})
+        this.setState({...initialState, errors: [...this.state.errors, e]})
       }
     } else if (rejected.length >= 0) {
-      this.setState({...initialState, errors: rejected})
+      let types = mime[this.props.accept].extensions.map((ext, i) =>
+        <span key={i} className="extension">{ i > 0 && ", "}{ext}</span>
+      );
+      let e = new Error(`File must be of type: ${types}`)
+      this.setState({...initialState, errors: [...this.state.errors, e]})
     }
   }
 
@@ -88,16 +92,14 @@ function ErrorState(props) {
     return null;
   }
 
-  let types = mime[props.mime].extensions.map((ext, i) =>
-    <span key={i} className="extension">{ i > 0 && ", "}{ext}</span>
+  let errors = props.errors.map((e, i) =>
+    <span key={i} className="error-message">{ i > 0 && (<br/>)}{e.message}</span>
   );
 
   return (
-    <div>
-      <p className="error-message">
-        File must be of type: {types}.
-      </p>
-    </div>
+    <p>
+      {errors}
+    </p>
   );
 }
 

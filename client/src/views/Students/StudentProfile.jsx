@@ -1,11 +1,12 @@
 import React from 'react';
 import FileUploadDialog from 'Components/FileUploadDialog';
 import request from 'superagent';
-import config from './mock-config';
-import mocker from 'superagent-mock';
+import getJWTHeader from '../../jwt';
+//import config from './mock-config';
+//import mocker from 'superagent-mock';
 
-const logger = log => console.log("mock", log);
-const mock = mocker(request, config, logger);
+//const logger = log => console.log("mock", log);
+//const mock = mocker(request, config, logger);
 
 export default class StudentProfile extends React.Component {
   constructor() {
@@ -33,14 +34,20 @@ export default class StudentProfile extends React.Component {
       throw new Error("Expecting exactly 1 CV")
     }
 
-    console.log(config[0].post.toString());
+    let headers = await getJWTHeader("/students/auth/jwt/token");
+    let token = headers.get('Authorization');
 
-    let data = await request
-      .post('/cv')
-      .attach('cv', files[0]).
-      on('progress', event => {
-        progress(event.percent);
-      });
+    try {
+      let data = await request
+        .post('/students/api/cv')
+        .set('Authorization', token)
+        .attach('cv', files[0]).
+        on('progress', event => {
+          progress(event.percent);
+        });
+    } catch (e) {
+      throw new Error("Failed to upload file")
+    }
   }
 
   render() {
