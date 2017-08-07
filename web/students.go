@@ -31,6 +31,12 @@ func makeStudentService(staticFiles string) *student.Service {
 		log.Fatal(err)
 	}
 
+	s3, err := config.GetS3("cvs/")
+	if err != nil {
+		log.Fatal(err)
+	}
+	service.SetupStorer(s3)
+
 	db, err := config.GetDB()
 	if err != nil {
 		log.Fatal(err)

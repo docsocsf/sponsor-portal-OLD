@@ -25,9 +25,9 @@ services:
     image: minio/mc
     entrypoint: [
       "sh", "-c",
-      "sleep 5 &&\
+      "while ! wget -q -s http://minio:9000/minio/login; do sleep 1; done; \
        mc config host add minio http://172.19.0.2:9000 ${AWS_ACCESS_KEY} ${AWS_SECRET_KEY} &&\
-       mc mb -p minio/cvs"
+       mc mb -p minio/${S3_BUCKET}"
     ]
     networks:
       - minionet
