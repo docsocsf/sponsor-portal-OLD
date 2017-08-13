@@ -4,15 +4,13 @@ import fetchWithConfig from './fetch';
 const getJWTHeader = async (endpoint, hdr) => {
   const token = await getToken(endpoint);
 
-  const headers = hdr || new Headers();
-  headers.append('Authorization', `Bearer ${token}`);
-  return headers;
+  return {...hdr, Authorization: `Bearer ${token}`}
 }
 
 const getToken = memoize(async (endpoint) => {
-  const response = await fetchWithConfig(endpoint);
+  const resp = await fetchWithConfig(endpoint);
 
-  return response.text();
+  return resp.text;
 }, {maxAge: 60000});
 
 export default getJWTHeader;

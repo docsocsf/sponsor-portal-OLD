@@ -22,6 +22,7 @@ func (s *Service) getApiRoutes() http.Handler {
 	api := mux.NewRouter()
 	api.HandleFunc("/user", s.getUserInformation)
 	api.HandleFunc("/cv", s.uploadCV).Methods(http.MethodPost)
+	api.HandleFunc("/cv", s.getCV).Methods(http.MethodGet)
 
 	return s.Auth.RequireJWT(api)
 }

@@ -9,6 +9,15 @@ import (
 	"github.com/docsocsf/sponsor-portal/config"
 )
 
+type DbError struct {
+	NotFound bool
+	Err      error
+}
+
+func (err DbError) Error() string {
+	return err.Err.Error()
+}
+
 func NewDB(config config.Database) (*sql.DB, error) {
 	connectionString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		config.Username, config.Password,

@@ -7,53 +7,63 @@ const initialState = {
   loading: false,
   percent: 0,
   files: [],
-  errors: [],
+  error: undefined,
 };
 
 export default class FileUploadDialog extends React.Component {
-  constructor() {
-    super()
-
+  constructor(props) {
+    super(props)
     this.state = initialState;
     this.getState = this.getState.bind(this);
     this.fileUpload = this.fileUpload.bind(this);
+    this.updateFile = this.updateFile.bind(this);
   }
 
-  async fileUpload(accepted, rejected){
+  async fileUpload(accepted, rejected) {
     if (accepted.length >= 1) {
       try {
         this.setState({loading: true})
         let data = await this.props.onUpload(accepted, percent =>
           this.setState({percent}));
-        this.setState({...initialState, files: accepted})
+        this.updateFile(accepted);
       } catch (e) {
-        this.setState({...initialState, errors: [...this.state.errors, e]})
+        console.log(e)
+        let err = <p className="error-message">{e.message}</p>
+        this.setState({...initialState, error: err})
       }
     } else if (rejected.length >= 0) {
-      let types = mime[this.props.accept].extensions.map((ext, i) =>
-        <span key={i} className="extension">{ i > 0 && ", "}{ext}</span>
-      );
-      let e = new Error(`File must be of type: ${types}`)
-      this.setState({...initialState, errors: [...this.state.errors, e]})
+      let err = typeError(this.props.accept)
+      this.setState({...initialState, error: err})
     }
   }
 
+  typeError(valid) {
+    return (
+      <p className="error-message">File must be of type: {
+        mime[valid].extensions.map((ext, i) =>
+          <span key={i} className="extension">{ i > 0 && ", "}{ext}</span>
+        )
+      }</p>
+    )
+  }
+
   getState() {
-    let {files, errors, loading} = this.state;
-    if (loading) {
-      return "loading";
-    } else if (files.length > 0) {
-      return "accept";
-    } else if (errors.length > 0) {
-      return "reject"
-    } else {
-      return "empty"
+    let {files, error, loading} = this.state;
+    switch (true) {
+      case loading: return "loading";
+      case files.length > 0: return "accept";
+      case !!error: return "reject";
+      default: return "empty";
     }
+  }
+
+  updateFile(accepted) {
+      this.setState({...initialState, files: accepted})
   }
 
   render() {
     let { accept, className, multiple } = this.props;
-    let { files, errors, loading, percent } = this.state;
+    let { files, error, loading, percent } = this.state;
     let state = this.getState();
 
     return (
@@ -65,7 +75,7 @@ export default class FileUploadDialog extends React.Component {
             ref={(node) => { this.dropzoneRef = node }}
           >
             <SuccessState files={files} loading={loading}/>
-            <ErrorState errors={errors} mime={accept}/>
+            <ErrorState error={error} mime={accept}/>
             <LoadingState loading={loading} percent={percent} />
             <EmptyState files={files} loading={loading} open={e => this.dropzoneRef.open()} />
           </Dropzone>
@@ -88,19 +98,11 @@ function SuccessState(props) {
 }
 
 function ErrorState(props) {
-  if (!props.errors.length > 0) {
+  if (!props.error) {
     return null;
   }
 
-  let errors = props.errors.map((e, i) =>
-    <span key={i} className="error-message">{ i > 0 && (<br/>)}{e.message}</span>
-  );
-
-  return (
-    <p>
-      {errors}
-    </p>
-  );
+  return props.error;
 }
 
 function LoadingState(props) {

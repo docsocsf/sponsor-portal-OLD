@@ -18,6 +18,8 @@ type Service struct {
 	s3     *model.S3
 
 	model.UserReader
+	model.CVReader
+	model.CVWriter
 }
 
 func New(authConfig *auth.Config, staticFiles string) (*Service, error) {
@@ -45,6 +47,8 @@ func (s *Service) SetupDatabase(dbConfig config.Database) error {
 	}
 
 	s.UserReader = model.NewUserReader(db)
+	s.CVReader = model.NewCVReader(db)
+	s.CVWriter = model.NewCVWriter(db)
 
 	return nil
 }

@@ -2,11 +2,6 @@ import React from 'react';
 import FileUploadDialog from 'Components/FileUploadDialog';
 import request from 'superagent';
 import getJWTHeader from '../../jwt';
-//import config from './mock-config';
-//import mocker from 'superagent-mock';
-
-//const logger = log => console.log("mock", log);
-//const mock = mocker(request, config, logger);
 
 export default class StudentProfile extends React.Component {
   constructor() {
@@ -14,10 +9,13 @@ export default class StudentProfile extends React.Component {
 
     this.state = {}
     this.getUser = this.getUser.bind(this);
+    this.getCV = this.getCV.bind(this);
+    this.uploadCV = this.uploadCV.bind(this);
   }
 
-  componentDidMount() {
-    this.getUser()
+  async componentDidMount() {
+    await this.getUser()
+    this.getCV()
   }
 
   async getUser() {
@@ -29,42 +27,57 @@ export default class StudentProfile extends React.Component {
     }
   }
 
+  async getCV() {
+    try {
+      const cv = await this.props.fetchCV()
+      this.setState({cv, upload: false})
+      this.fileRef.updateFile([cv])
+    } catch (e) {
+      if (e.status !== 404) {
+        console.log("fetch cv", e)
+      }
+    }
+  }
+
   async uploadCV(files, progress) {
     if (files.length > 1) {
       throw new Error("Expecting exactly 1 CV")
     }
 
     let headers = await getJWTHeader("/students/auth/jwt/token");
-    let token = headers.get('Authorization');
 
     try {
       let data = await request
         .post('/students/api/cv')
-        .set('Authorization', token)
+        .set(headers)
         .attach('cv', files[0]).
         on('progress', event => {
           progress(event.percent);
         });
+      this.setState({upload: false})
     } catch (e) {
+      console.log(e)
       throw new Error("Failed to upload file")
     }
   }
 
   render() {
+    let {user, cv, upload} = this.state;
     return (
       <div>
         <header id="home">
           <h1>
-            Hello, {this.state.user ? this.state.user.name : "Student"}!
+            Hello, {user ? user.name : "Student"}!
           </h1>
         </header>
         <section id="cv">
-          <h2>Upload CV</h2>
+          <h2>{ cv && !upload ? "Your CV" : "Upload CV"}</h2>
           <FileUploadDialog
             accept="application/pdf"
             className="cv"
             multiple={false}
             onUpload={this.uploadCV}
+            ref={n => this.fileRef = n}
           />
         </section>
       </div>
