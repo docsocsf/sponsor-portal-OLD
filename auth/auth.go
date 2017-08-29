@@ -3,12 +3,24 @@ package auth
 import (
 	"net/http"
 
+	"golang.org/x/oauth2"
+
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 	oauthService "google.golang.org/api/oauth2/v2"
 )
+
+type Auth interface {
+	//Handlers
+	Handler() http.Handler
+	handleCallback(w http.ResponseWriter, r *http.Request)
+	handleLogin(w http.ResponseWriter, r *http.Request)
+	handleLogout(w http.ResponseWriter, r *http.Request)
+
+	baseUrl() string
+	session(r *http.Request, sessionKey string) (*sessions.Session, error)
+	jwtConf() jwtConfig
+}
 
 type auth struct {
 	router *mux.Router
@@ -25,15 +37,14 @@ type auth struct {
 	jwt jwtConfig
 }
 
-type jwtConfig struct {
-	secret []byte
-	issuer string
-}
-
 type OAuth struct {
 	auth
 	oauth *oauth2.Config
 }
+
+type PasswordAuth = auth
+
+var scopes = []string{oauthService.UserinfoEmailScope, oauthService.UserinfoProfileScope}
 
 const (
 	login    = "/login"
@@ -42,50 +53,22 @@ const (
 	token    = "/jwt/token"
 )
 
-var scopes = []string{oauthService.UserinfoEmailScope, oauthService.UserinfoProfileScope}
-
 type UserInfo *oauthService.Userinfoplus
 
-func New(config *Config) (*OAuth, error) {
-	auth := &OAuth{
-		auth: auth{
-			store:   sessions.NewCookieStore(config.CookieSecret),
-			baseURL: config.BaseURL,
+func newAuth(config *Config) auth {
+	return auth{
+		store:   sessions.NewCookieStore(config.CookieSecret),
+		baseURL: config.BaseURL,
 
-			get: config.Get,
+		get: config.Get,
 
-			successHandler:    config.SuccessHandler,
-			failureHandler:    config.FailureHandler,
-			postLogoutHandler: config.PostLogoutHandler,
+		successHandler:    config.SuccessHandler,
+		failureHandler:    config.FailureHandler,
+		postLogoutHandler: config.PostLogoutHandler,
 
-			jwt: jwtConfig{
-				secret: config.JwtSecret,
-				issuer: config.JwtIssuer,
-			},
-		},
-		oauth: &oauth2.Config{
-			ClientID:     config.ClientID,
-			ClientSecret: config.ClientSecret,
-			RedirectURL:  config.BaseURL + callback,
-
-			Endpoint: google.Endpoint,
-
-			Scopes: scopes,
+		jwt: jwtConfig{
+			secret: config.JwtSecret,
+			issuer: config.JwtIssuer,
 		},
 	}
-
-	router := mux.NewRouter()
-
-	router.HandleFunc(login, auth.handleLogin)
-	router.HandleFunc(callback, auth.handleCallback)
-	router.HandleFunc(logout, auth.handleLogout)
-	router.Handle(token, auth.RequireAuth(http.HandlerFunc(auth.getToken)))
-
-	auth.router = router
-
-	return auth, nil
-}
-
-func (auth *OAuth) Handler() http.Handler {
-	return auth.router
 }

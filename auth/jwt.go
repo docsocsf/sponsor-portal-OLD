@@ -18,30 +18,32 @@ type Claims struct {
 	User UserIdentifier `json:"user,omitempty"`
 }
 
-func (auth *OAuth) getToken(w http.ResponseWriter, r *http.Request) {
-	claims := Claims{
-		jwt.StandardClaims{
-			Issuer:    auth.jwt.issuer,
-			ExpiresAt: getExpiry(),
-		},
-		User(r),
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+func getToken(auth auth) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		claims := Claims{
+			jwt.StandardClaims{
+				Issuer:    auth.jwt.issuer,
+				ExpiresAt: getExpiry(),
+			},
+			User(r),
+		}
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	json, err := token.SignedString(auth.jwt.secret)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+		json, err := token.SignedString(auth.jwt.secret)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-	w.Write([]byte(json))
+		w.Write([]byte(json))
+	})
 }
 
 func getExpiry() int64 {
 	return time.Now().Add(expiryTime).Unix()
 }
 
-func (auth *OAuth) RequireJWT(inner http.Handler) http.Handler {
+func RequireJWT(auth Auth, inner http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenStr := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
 		token, err := jwt.ParseWithClaims(tokenStr, new(Claims), func(token *jwt.Token) (interface{}, error) {
@@ -49,7 +51,7 @@ func (auth *OAuth) RequireJWT(inner http.Handler) http.Handler {
 				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 			}
 
-			return auth.jwt.secret, nil
+			return auth.jwtConf().secret, nil
 		})
 		if err != nil {
 			log.Println(err)

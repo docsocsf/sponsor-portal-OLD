@@ -23,7 +23,7 @@ func (s *Service) setupAuth(config *auth.Config) (err error) {
 		config.PostLogoutHandler = http.HandlerFunc(s.authPostLogoutHandler)
 	}
 
-	s.Auth, err = auth.New(config)
+	s.Auth, err = auth.NewOAuth(config)
 
 	return
 }

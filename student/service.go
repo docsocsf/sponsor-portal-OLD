@@ -14,7 +14,7 @@ type Service struct {
 	staticFiles string
 
 	router http.Handler
-	Auth   *auth.OAuth
+	Auth   auth.Auth
 	s3     *model.S3
 
 	model.UserReader

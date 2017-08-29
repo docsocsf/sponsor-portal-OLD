@@ -19,3 +19,8 @@ type Config struct {
 	JwtSecret []byte
 	JwtIssuer string
 }
+
+type jwtConfig struct {
+	secret []byte
+	issuer string
+}

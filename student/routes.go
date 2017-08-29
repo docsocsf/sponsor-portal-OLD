@@ -3,6 +3,7 @@ package student
 import (
 	"net/http"
 
+	"github.com/docsocsf/sponsor-portal/auth"
 	"github.com/gorilla/mux"
 )
 
@@ -12,7 +13,7 @@ func (s *Service) getRoutes() http.Handler {
 	// auth
 	router.PathPrefix("/auth/").Handler(http.StripPrefix("/auth", s.Auth.Handler()))
 
-	router.Handle("/", s.Auth.RequireAuth(indexHandler(s)))
+	router.Handle("/", auth.RequireAuth(s.Auth, indexHandler(s)))
 	router.PathPrefix("/api/").Handler(http.StripPrefix("/api", s.getApiRoutes()))
 
 	return router
@@ -24,7 +25,7 @@ func (s *Service) getApiRoutes() http.Handler {
 	api.HandleFunc("/cv", s.uploadCV).Methods(http.MethodPost)
 	api.HandleFunc("/cv", s.getCV).Methods(http.MethodGet)
 
-	return s.Auth.RequireJWT(api)
+	return auth.RequireJWT(s.Auth, api)
 }
 
 func indexHandler(s *Service) http.HandlerFunc {
