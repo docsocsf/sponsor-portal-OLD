@@ -11,7 +11,7 @@ type UserIdentifier interface{}
 
 var userSessionKey = "user"
 
-func (auth *Auth) getCurrentUser(r *http.Request) (UserIdentifier, error) {
+func (auth *OAuth) getCurrentUser(r *http.Request) (UserIdentifier, error) {
 	session, err := auth.store.Get(r, sessionKey)
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func (auth *Auth) getCurrentUser(r *http.Request) (UserIdentifier, error) {
 	return nil, nil
 }
 
-func (auth *Auth) setCurrentUser(w http.ResponseWriter, r *http.Request, userID UserIdentifier) error {
+func (auth *OAuth) setCurrentUser(w http.ResponseWriter, r *http.Request, userID UserIdentifier) error {
 	session, err := auth.store.Get(r, sessionKey)
 	if err != nil {
 		return err
@@ -44,7 +44,7 @@ func (auth *Auth) setCurrentUser(w http.ResponseWriter, r *http.Request, userID 
 	return nil
 }
 
-func (auth *Auth) deleteCurrentUser(w http.ResponseWriter, r *http.Request) error {
+func (auth *OAuth) deleteCurrentUser(w http.ResponseWriter, r *http.Request) error {
 	session, err := auth.store.Get(r, sessionKey)
 	if err != nil {
 		return err

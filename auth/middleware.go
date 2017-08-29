@@ -10,7 +10,7 @@ type userKeyType int
 
 const userKey userKeyType = iota
 
-func (auth *Auth) RequireAuth(inner http.Handler) http.Handler {
+func (auth *OAuth) RequireAuth(inner http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userId, err := auth.getCurrentUser(r)
 		if err != nil {

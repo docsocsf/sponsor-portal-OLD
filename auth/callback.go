@@ -11,7 +11,7 @@ import (
 
 const userInfoEndpoint = "https://www.googleapis.com/oauth2/v2/userinfo?access_token="
 
-func (auth *Auth) handleCallback(w http.ResponseWriter, r *http.Request) {
+func (auth *OAuth) handleCallback(w http.ResponseWriter, r *http.Request) {
 	expectedState, err := auth.getAndDeleteState(w, r)
 	if err != nil {
 		log.Println(err.Error())

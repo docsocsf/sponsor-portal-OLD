@@ -19,7 +19,7 @@ func randToken() string {
 	return base64.StdEncoding.EncodeToString(b)
 }
 
-func (auth *Auth) generateAndStoreState(w http.ResponseWriter, r *http.Request) (string, error) {
+func (auth *OAuth) generateAndStoreState(w http.ResponseWriter, r *http.Request) (string, error) {
 	state := randToken()
 
 	session, err := auth.store.Get(r, sessionKey)
@@ -38,7 +38,7 @@ func (auth *Auth) generateAndStoreState(w http.ResponseWriter, r *http.Request) 
 	return state, nil
 }
 
-func (auth *Auth) getAndDeleteState(w http.ResponseWriter, r *http.Request) (string, error) {
+func (auth *OAuth) getAndDeleteState(w http.ResponseWriter, r *http.Request) (string, error) {
 	session, err := auth.store.Get(r, sessionKey)
 	if err != nil {
 		return "", err

@@ -10,13 +10,11 @@ import (
 	oauthService "google.golang.org/api/oauth2/v2"
 )
 
-type Auth struct {
+type auth struct {
 	router *mux.Router
 
 	store   sessions.Store
 	baseURL string
-
-	oauth *oauth2.Config
 
 	get func(info UserInfo) (UserIdentifier, error)
 
@@ -32,6 +30,11 @@ type jwtConfig struct {
 	issuer string
 }
 
+type OAuth struct {
+	auth
+	oauth *oauth2.Config
+}
+
 const (
 	login    = "/login"
 	logout   = "/logout"
@@ -43,11 +46,23 @@ var scopes = []string{oauthService.UserinfoEmailScope, oauthService.UserinfoProf
 
 type UserInfo *oauthService.Userinfoplus
 
-func New(config *Config) (*Auth, error) {
-	auth := &Auth{
-		store:   sessions.NewCookieStore(config.CookieSecret),
-		baseURL: config.BaseURL,
+func New(config *Config) (*OAuth, error) {
+	auth := &OAuth{
+		auth: auth{
+			store:   sessions.NewCookieStore(config.CookieSecret),
+			baseURL: config.BaseURL,
 
+			get: config.Get,
+
+			successHandler:    config.SuccessHandler,
+			failureHandler:    config.FailureHandler,
+			postLogoutHandler: config.PostLogoutHandler,
+
+			jwt: jwtConfig{
+				secret: config.JwtSecret,
+				issuer: config.JwtIssuer,
+			},
+		},
 		oauth: &oauth2.Config{
 			ClientID:     config.ClientID,
 			ClientSecret: config.ClientSecret,
@@ -56,17 +71,6 @@ func New(config *Config) (*Auth, error) {
 			Endpoint: google.Endpoint,
 
 			Scopes: scopes,
-		},
-
-		get: config.Get,
-
-		successHandler:    config.SuccessHandler,
-		failureHandler:    config.FailureHandler,
-		postLogoutHandler: config.PostLogoutHandler,
-
-		jwt: jwtConfig{
-			secret: config.JwtSecret,
-			issuer: config.JwtIssuer,
 		},
 	}
 
@@ -82,6 +86,6 @@ func New(config *Config) (*Auth, error) {
 	return auth, nil
 }
 
-func (auth *Auth) Handler() http.Handler {
+func (auth *OAuth) Handler() http.Handler {
 	return auth.router
 }

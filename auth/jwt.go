@@ -18,7 +18,7 @@ type Claims struct {
 	User UserIdentifier `json:"user,omitempty"`
 }
 
-func (auth *Auth) getToken(w http.ResponseWriter, r *http.Request) {
+func (auth *OAuth) getToken(w http.ResponseWriter, r *http.Request) {
 	claims := Claims{
 		jwt.StandardClaims{
 			Issuer:    auth.jwt.issuer,
@@ -41,7 +41,7 @@ func getExpiry() int64 {
 	return time.Now().Add(expiryTime).Unix()
 }
 
-func (auth *Auth) RequireJWT(inner http.Handler) http.Handler {
+func (auth *OAuth) RequireJWT(inner http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenStr := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
 		token, err := jwt.ParseWithClaims(tokenStr, new(Claims), func(token *jwt.Token) (interface{}, error) {
