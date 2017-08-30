@@ -2,3 +2,50 @@
 @import 'colors';
 @import 'buttons';
 
+section#cv {
+  background: white;
+  padding: 5px 10px 25px;
+  max-width:680px;
+  margin: 0 auto;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px $grey;
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .cv {
+    text-align: center;
+    padding: 20px;
+    margin: 0 auto;
+    max-width: 600px;
+    vertical-align: center;
+    border-radius: 6px;
+    border: 6px dashed whitesmoke;
+    cursor: pointer;
+
+    &.accept {
+      border-color: #009900;
+    }
+
+    &.loading {
+      border-color: #000099;
+    }
+
+    &.reject {
+      border-color: #990000;
+
+      .error-message {
+        color: #990000;
+      }
+    }
+
+    &.empty {
+      border-color: $grey;
+    }
+  }
+
+  progress {
+  }
+}

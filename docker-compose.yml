@@ -1,6 +1,6 @@
-version: '2'
+version: '3'
 services:
-  sponsor_portal_db:
+  db:
     image: postgres:9.6.2
     environment:
       - POSTGRES_USER=${DB_USER}
@@ -11,3 +11,33 @@ services:
       - ${DB_PORT}
     ports:
       - "${DB_PORT}:${DB_PORT}"
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+    networks:
+      - minionet
+    environment:
+      - MINIO_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${AWS_SECRET_KEY}
+    command: server /export
+  minio_setup:
+    image: minio/mc
+    entrypoint: [
+      "sh", "-c",
+      "while ! wget -q -s http://minio:9000/minio/login; do sleep 1; done; \
+       mc config host add minio http://172.19.0.2:9000 ${AWS_ACCESS_KEY} ${AWS_SECRET_KEY} &&\
+       mc mb -p minio/${S3_BUCKET}"
+    ]
+    networks:
+      - minionet
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}
+      - AWS_REGION=${AWS_REGION}
+    links:
+      - minio
+    depends_on:
+      - minio
+networks:
+  minionet:

@@ -15,7 +15,11 @@ type Service struct {
 
 	router http.Handler
 	Auth   *auth.Auth
+	s3     *model.S3
+
 	model.UserReader
+	model.CVReader
+	model.CVWriter
 }
 
 func New(authConfig *auth.Config, staticFiles string) (*Service, error) {
@@ -32,6 +36,10 @@ func New(authConfig *auth.Config, staticFiles string) (*Service, error) {
 	return &service, nil
 }
 
+func (s *Service) SetupStorer(s3Config config.S3) {
+	s.s3 = model.NewS3(s3Config.Aws, s3Config.Bucket, s3Config.Prefix)
+}
+
 func (s *Service) SetupDatabase(dbConfig config.Database) error {
 	db, err := model.NewDB(dbConfig)
 	if err != nil {
@@ -39,6 +47,8 @@ func (s *Service) SetupDatabase(dbConfig config.Database) error {
 	}
 
 	s.UserReader = model.NewUserReader(db)
+	s.CVReader = model.NewCVReader(db)
+	s.CVWriter = model.NewCVWriter(db)
 
 	return nil
 }

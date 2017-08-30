@@ -14,4 +14,14 @@ button {
   cursor: pointer;
 
   font-size: 1.2rem;
+
+  &.small {
+    font-size: 0.8rem;
+
+    padding: 4px 8px;
+  }
+
+  &:hover {
+    background: darken($background, 7%);
+  }
 }
