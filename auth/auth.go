@@ -23,12 +23,20 @@ type Auth struct {
 	successHandler    http.Handler
 	failureHandler    http.Handler
 	postLogoutHandler http.Handler
+
+	jwt jwtConfig
+}
+
+type jwtConfig struct {
+	secret []byte
+	issuer string
 }
 
 const (
 	login    = "/login"
 	logout   = "/logout"
 	callback = "/callback"
+	token    = "/jwt/token"
 )
 
 var scopes = []string{oauthService.UserinfoEmailScope, oauthService.UserinfoProfileScope}
@@ -55,6 +63,11 @@ func New(config *Config) (*Auth, error) {
 		successHandler:    config.SuccessHandler,
 		failureHandler:    config.FailureHandler,
 		postLogoutHandler: config.PostLogoutHandler,
+
+		jwt: jwtConfig{
+			secret: config.JwtSecret,
+			issuer: config.JwtIssuer,
+		},
 	}
 
 	router := mux.NewRouter()
@@ -62,6 +75,7 @@ func New(config *Config) (*Auth, error) {
 	router.HandleFunc(login, auth.handleLogin)
 	router.HandleFunc(callback, auth.handleCallback)
 	router.HandleFunc(logout, auth.handleLogout)
+	router.Handle(token, auth.RequireAuth(http.HandlerFunc(auth.getToken)))
 
 	auth.router = router
 

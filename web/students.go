@@ -8,7 +8,7 @@ import (
 	"github.com/docsocsf/sponsor-portal/student"
 )
 
-func makeStudentService() *student.Service {
+func makeStudentService(staticFiles string) *student.Service {
 	authEnvConfig, err := config.GetAuth()
 	if err != nil {
 		log.Fatal(err, "Make student service")
@@ -21,9 +21,12 @@ func makeStudentService() *student.Service {
 		Issuer:       authEnvConfig.Issuer,
 		ClientID:     authEnvConfig.ClientID,
 		ClientSecret: authEnvConfig.ClientSecret,
+
+		JwtSecret: []byte(authEnvConfig.JwtSecret),
+		JwtIssuer: authEnvConfig.JwtIssuer,
 	}
 
-	service, err := student.New(authConfig)
+	service, err := student.New(authConfig, staticFiles)
 	if err != nil {
 		log.Fatal(err)
 	}

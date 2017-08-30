@@ -1,5 +1,5 @@
-hash: b2be70df2d6ff649508bada1d497832e448bbc09dbdde4a68261c7d96bc20fac
-updated: 2017-07-12T19:13:25.651313397+01:00
+hash: 9c6c44b05a42b39232d3e4327985ffbdf0f22cf1da5565301b59b5517050a2eb
+updated: 2017-07-22T21:27:25.866581028+01:00
 imports:
 - name: cloud.google.com/go
   version: d2bf9ead8d595b9347434a2bcbaec6395862adab
@@ -7,6 +7,8 @@ imports:
   - compute/metadata
 - name: github.com/caarlos0/env
   version: 0cf029d5748c52beb2c9d20c81880cb4bdf8f788
+- name: github.com/dgrijalva/jwt-go
+  version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
 - name: github.com/golang/protobuf
   version: 5a0f697c9ed9d68fef0116532c6e05cfeae00e55
   subpackages:

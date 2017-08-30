@@ -7,9 +7,12 @@ const extractSass = new ExtractTextPlugin({
   allChunks: true
 });
 
+const polyfill = (...files) => ["babel-polyfill", ...files];
+
 module.exports = {
   entry: {
-    index: "./src/index.js",
+    index: polyfill("./src/index.js"),
+    students: polyfill("./src/students.js"),
   },
   output: {
     path: path.resolve("dist/assets"),
