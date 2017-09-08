@@ -18,6 +18,9 @@ func main() {
 	student := makeStudentService(host.StaticFiles)
 	http.Handle("/students/", http.StripPrefix("/students", student.Handler()))
 
+	sponsor := makeSponsorService()
+	http.Handle("/sponsors/", http.StripPrefix("/sponsors", sponsor.Handler()))
+
 	root := http.FileServer(http.Dir(host.StaticFiles))
 	http.Handle("/assets/", root)
 	http.Handle("/", root)
