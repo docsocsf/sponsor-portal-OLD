@@ -10,6 +10,10 @@ button {
   margin: 0 5px;
   color: whitesmoke;
 
+  a {
+    color: whitesmoke
+  }
+
   border-radius: 3px;
   cursor: pointer;
 
@@ -23,5 +27,8 @@ button {
 
   &:hover {
     background: darken($background, 7%);
+    a {
+      color: darken(whitesmoke, 10%);
+    }
   }
 }

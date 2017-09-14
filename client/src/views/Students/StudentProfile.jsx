@@ -30,12 +30,11 @@ export default class StudentProfile extends React.Component {
   async getCV() {
     try {
       const cv = await this.props.fetchCV()
+      if (!cv) return
       this.setState({cv, upload: false})
       this.fileRef.updateFile([cv])
     } catch (e) {
-      if (e.status !== 404) {
-        console.log("fetch cv", e)
-      }
+      console.log("fetch cv", e)
     }
   }
 

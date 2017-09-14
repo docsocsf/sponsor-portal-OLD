@@ -7,15 +7,26 @@ const defaultConfig = {
     'Content-Type': 'application/json',
   },
   credentials: 'same-origin',
+  type: 'json'
 };
 
 const fetchWithConfig = (url, configOverrides) => {
   const config = {...defaultConfig, ...configOverrides};
 
-  var req = request(config.method, url)
+  if (config.method === "POST") {
+    console.log("POST", config.data)
+    let req = request(config.method, url)
+      .type(config.type)
+      .send(config.data)
+      .set(config.headers)
+      .withCredentials(config.credentials);
+    console.log(req);
+    return req;
+  }
+
+  return request(config.method, url)
     .set(config.headers)
     .withCredentials(config.credentials);
-  return req;
 }
 
 export default fetchWithConfig;

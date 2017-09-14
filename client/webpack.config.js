@@ -13,6 +13,7 @@ module.exports = {
   entry: {
     index: polyfill("./src/index.js"),
     students: polyfill("./src/students.js"),
+    sponsors: polyfill("./src/sponsors.js"),
   },
   output: {
     path: path.resolve("dist/assets"),

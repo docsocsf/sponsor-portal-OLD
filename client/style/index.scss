@@ -7,8 +7,25 @@
 
   .student {
     background: lighten($background, 10);
-    a {
-      color: whitesmoke;
+  }
+}
+
+#login-form {
+  width: 450px;
+  margin: 0 auto;
+
+  form {
+    margin: 40px auto;
+    padding: 15px;
+    background: white;
+    border-radius: 4px;
+
+    input[type="text"],
+    input[type="password"],
+    input[type="submit"] {
+      padding: 4px;
+      margin: 5px auto;
+      display: block;
     }
   }
 }
