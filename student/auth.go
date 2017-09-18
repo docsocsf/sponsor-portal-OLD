@@ -69,6 +69,6 @@ func redirect(w http.ResponseWriter, r *http.Request, to string) {
 		return
 	}
 
-	w.Header().Set("Location", baseUri.ResolveReference(newUri).String())
-	w.WriteHeader(http.StatusSeeOther)
+	path := baseUri.ResolveReference(newUri).String()
+	http.Redirect(w, r, path, http.StatusSeeOther)
 }

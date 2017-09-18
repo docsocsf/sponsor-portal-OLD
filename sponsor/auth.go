@@ -1,6 +1,7 @@
 package sponsor
 
 import (
+	"errors"
 	"net/http"
 	"net/url"
 
@@ -30,10 +31,18 @@ func (s *Service) setupAuth(config *auth.Config) (err error) {
 
 func (s *Service) authHandler(info auth.UserInfo) (auth.UserIdentifier, error) {
 	userModel := model.User{
-		Name: info.Name,
 		Auth: &model.UserAuth{
 			Email: info.Email,
 		},
+	}
+
+	hashedPassword, err := s.UserReader.HashedPassword(info.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if !auth.PasswordCorrect(info.Password, hashedPassword) {
+		return nil, errors.New("Incorrect password")
 	}
 
 	user, err := s.UserReader.Get(userModel)
@@ -45,7 +54,7 @@ func (s *Service) authHandler(info auth.UserInfo) (auth.UserIdentifier, error) {
 }
 
 func (s *Service) authSuccessHandler(w http.ResponseWriter, r *http.Request) {
-	redirect(w, r, "/sponsors")
+	redirect(w, r, "/sponsors/")
 }
 
 func (s *Service) authFailureHandler(w http.ResponseWriter, r *http.Request) {
@@ -70,6 +79,6 @@ func redirect(w http.ResponseWriter, r *http.Request, to string) {
 		return
 	}
 
-	w.Header().Set("Location", baseUri.ResolveReference(newUri).String())
-	w.WriteHeader(http.StatusSeeOther)
+	path := baseUri.ResolveReference(newUri).String()
+	http.Redirect(w, r, path, http.StatusSeeOther)
 }

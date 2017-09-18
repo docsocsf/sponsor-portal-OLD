@@ -14,7 +14,7 @@ func NewPasswordAuth(config *Config) (*PasswordAuth, error) {
 
 	router := mux.NewRouter()
 
-	router.HandleFunc(login, auth.handleLogin)
+	router.HandleFunc(login, auth.handleLogin).Methods(http.MethodPost)
 	router.HandleFunc(callback, auth.handleCallback)
 	router.HandleFunc(logout, auth.handleLogout)
 	router.Handle(token, RequireAuth(auth, getToken(*auth)))
@@ -40,10 +40,24 @@ func (auth *PasswordAuth) Handler() http.Handler {
 	return auth.router
 }
 
-// TODO: Replace with real auth
 func (auth *PasswordAuth) handleLogin(w http.ResponseWriter, r *http.Request) {
-	id := 1
-	err := setCurrentUser(auth, w, r, id)
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+	ui := UserInfo{
+		&UserInfoPlus{
+			Email: email,
+		},
+		password,
+	}
+
+	id, err := auth.get(ui)
+	if err != nil {
+		log.Println(err.Error())
+		auth.failureHandler.ServeHTTP(w, r)
+		return
+	}
+
+	err = setCurrentUser(auth, w, r, id)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -64,5 +78,5 @@ func (auth *PasswordAuth) handleLogout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (auth *PasswordAuth) handleCallback(w http.ResponseWriter, r *http.Request) {
-	// To fullfill interface
+	// To fullfill interface (TODO rethink if needed)
 }

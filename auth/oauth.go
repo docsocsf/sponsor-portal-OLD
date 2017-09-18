@@ -115,7 +115,7 @@ func (auth *OAuth) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := auth.get(ui)
+	id, err := auth.get(UserInfo{ui, ""})
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, "Failed to get (or create) user", http.StatusInternalServerError)

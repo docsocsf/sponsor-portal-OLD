@@ -1,33 +1,21 @@
 package sponsor
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/docsocsf/sponsor-portal/auth"
 	"github.com/gorilla/mux"
 )
 
-func (s *Service) getRoutes() http.Handler {
-	router := mux.NewRouter()
-
+func (s *Service) defineRoutes(r *mux.Router) {
 	// auth
-	router.PathPrefix("/auth/").Handler(http.StripPrefix("/auth", s.Auth.Handler()))
+	r.PathPrefix("/auth").Handler(http.StripPrefix("/sponsors/auth", s.Auth.Handler()))
 
-	router.Handle("/", auth.RequireAuth(s.Auth, indexHandler(s)))
-
-	return router
+	r.Handle("/", auth.RequireAuth(s.Auth, indexHandler(s)))
 }
 
 func indexHandler(s *Service) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id := auth.User(r)
-
-		user, err := s.UserReader.GetById(id)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		fmt.Fprintf(w, "Hello, %s", user.Name)
+		http.ServeFile(w, r, s.staticFiles+"/sponsors.html")
 	})
 }

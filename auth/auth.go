@@ -3,6 +3,7 @@ package auth
 import (
 	"net/http"
 
+	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 
 	"github.com/gorilla/mux"
@@ -53,7 +54,12 @@ const (
 	token    = "/jwt/token"
 )
 
-type UserInfo *oauthService.Userinfoplus
+type UserInfoPlus = oauthService.Userinfoplus
+
+type UserInfo struct {
+	*UserInfoPlus
+	Password string
+}
 
 func newAuth(config *Config) auth {
 	return auth{
@@ -71,4 +77,8 @@ func newAuth(config *Config) auth {
 			issuer: config.JwtIssuer,
 		},
 	}
+}
+
+func PasswordCorrect(password, hashedPassword string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password)) == nil
 }

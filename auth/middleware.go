@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"path"
 )
 
 type userKeyType int
@@ -34,7 +35,7 @@ func RequireAuth(auth Auth, inner http.Handler) http.Handler {
 		}
 
 		if userId == nil {
-			http.Redirect(w, r, auth.baseUrl()+"/login", http.StatusTemporaryRedirect)
+			http.Redirect(w, r, path.Join(auth.baseUrl(), login), http.StatusTemporaryRedirect)
 			return
 		}
 

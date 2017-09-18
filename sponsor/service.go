@@ -1,29 +1,27 @@
 package sponsor
 
 import (
-	"net/http"
-	"os"
-
 	"github.com/docsocsf/sponsor-portal/auth"
 	"github.com/docsocsf/sponsor-portal/config"
 	"github.com/docsocsf/sponsor-portal/model"
-	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 )
 
 type Service struct {
-	router http.Handler
-	Auth   auth.Auth
+	staticFiles string
+
+	Auth auth.Auth
 	model.UserReader
 }
 
-func New(authConfig *auth.Config) (*Service, error) {
-	service := Service{}
+func New(authConfig *auth.Config, staticFiles string) (*Service, error) {
+	service := Service{
+		staticFiles: staticFiles,
+	}
 
 	if err := service.setupAuth(authConfig); err != nil {
 		return nil, err
 	}
-
-	service.router = service.getRoutes()
 
 	return &service, nil
 }
@@ -39,6 +37,6 @@ func (s *Service) SetupDatabase(dbConfig config.Database) error {
 	return nil
 }
 
-func (s *Service) Handler() http.Handler {
-	return handlers.LoggingHandler(os.Stdout, s.router)
+func (s *Service) Handle(r *mux.Router) {
+	s.defineRoutes(r.PathPrefix("/sponsors").Subrouter())
 }

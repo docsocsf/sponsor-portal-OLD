@@ -8,7 +8,7 @@ import (
 	"github.com/docsocsf/sponsor-portal/sponsor"
 )
 
-func makeSponsorService() *sponsor.Service {
+func makeSponsorService(staticFiles string) *sponsor.Service {
 	authEnvConfig, err := config.GetAuth()
 	if err != nil {
 		log.Fatal(err, "Make sponsor service")
@@ -17,7 +17,7 @@ func makeSponsorService() *sponsor.Service {
 	authConfig := &auth.Config{
 		CookieSecret: []byte(authEnvConfig.CookieSecret),
 
-		BaseURL:      authEnvConfig.BaseURL + "/sponsors/auth",
+		BaseURL:      authEnvConfig.BaseURL,
 		Issuer:       authEnvConfig.Issuer,
 		ClientID:     authEnvConfig.ClientID,
 		ClientSecret: authEnvConfig.ClientSecret,
@@ -26,7 +26,7 @@ func makeSponsorService() *sponsor.Service {
 		JwtIssuer: authEnvConfig.JwtIssuer,
 	}
 
-	service, err := sponsor.New(authConfig)
+	service, err := sponsor.New(authConfig, staticFiles)
 	if err != nil {
 		log.Fatal(err)
 	}

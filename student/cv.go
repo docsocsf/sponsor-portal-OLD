@@ -60,7 +60,6 @@ func (s *Service) getCV(w http.ResponseWriter, r *http.Request) {
 		switch e := err.(type) {
 		case model.DbError:
 			if e.NotFound {
-				http.Error(w, err.Error(), http.StatusNotFound)
 				return
 			}
 		}

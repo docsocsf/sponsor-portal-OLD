@@ -1,21 +1,17 @@
 package student
 
 import (
-	"net/http"
-	"os"
-
 	"github.com/docsocsf/sponsor-portal/auth"
 	"github.com/docsocsf/sponsor-portal/config"
 	"github.com/docsocsf/sponsor-portal/model"
-	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 )
 
 type Service struct {
 	staticFiles string
 
-	router http.Handler
-	Auth   auth.Auth
-	s3     *model.S3
+	Auth auth.Auth
+	s3   *model.S3
 
 	model.UserReader
 	model.CVReader
@@ -30,8 +26,6 @@ func New(authConfig *auth.Config, staticFiles string) (*Service, error) {
 	if err := service.setupAuth(authConfig); err != nil {
 		return nil, err
 	}
-
-	service.router = service.getRoutes()
 
 	return &service, nil
 }
@@ -53,6 +47,6 @@ func (s *Service) SetupDatabase(dbConfig config.Database) error {
 	return nil
 }
 
-func (s *Service) Handler() http.Handler {
-	return handlers.LoggingHandler(os.Stdout, s.router)
+func (s *Service) Handle(r *mux.Router) {
+	s.defineRoutes(r.PathPrefix("/students").Subrouter())
 }
