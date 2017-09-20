@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"log"
 	"net/http"
 
 	"golang.org/x/crypto/bcrypt"
@@ -9,6 +10,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	oauthService "google.golang.org/api/oauth2/v2"
+
+	"github.com/docsocsf/sponsor-portal/config"
 )
 
 type Auth interface {
@@ -20,13 +23,12 @@ type Auth interface {
 
 	baseUrl() string
 	session(r *http.Request, sessionKey string) (*sessions.Session, error)
-	jwtConf() jwtConfig
 }
 
 type auth struct {
 	router *mux.Router
 
-	store   sessions.Store
+	store   *sessions.CookieStore
 	baseURL string
 
 	get func(info UserInfo) (UserIdentifier, error)
@@ -35,7 +37,6 @@ type auth struct {
 	failureHandler    http.Handler
 	postLogoutHandler http.Handler
 
-	jwt jwtConfig
 }
 
 type OAuth struct {
@@ -61,9 +62,19 @@ type UserInfo struct {
 	Password string
 }
 
+var cookieJar *sessions.CookieStore
+
+func init() {
+	cookieConfig, err := config.GetAuth()
+	if err != nil {
+		log.Fatal("Could not gett cookie secret")
+	}
+	cookieJar = sessions.NewCookieStore([]byte(cookieConfig.CookieSecret))
+}
+
 func newAuth(config *Config) auth {
 	return auth{
-		store:   sessions.NewCookieStore(config.CookieSecret),
+		store:   cookieJar,
 		baseURL: config.BaseURL,
 
 		get: config.Get,
@@ -71,11 +82,6 @@ func newAuth(config *Config) auth {
 		successHandler:    config.SuccessHandler,
 		failureHandler:    config.FailureHandler,
 		postLogoutHandler: config.PostLogoutHandler,
-
-		jwt: jwtConfig{
-			secret: config.JwtSecret,
-			issuer: config.JwtIssuer,
-		},
 	}
 }
 

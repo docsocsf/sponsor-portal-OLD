@@ -15,15 +15,10 @@ func makeSponsorService(staticFiles string) *sponsor.Service {
 	}
 
 	authConfig := &auth.Config{
-		CookieSecret: []byte(authEnvConfig.CookieSecret),
-
 		BaseURL:      authEnvConfig.BaseURL,
 		Issuer:       authEnvConfig.Issuer,
 		ClientID:     authEnvConfig.ClientID,
 		ClientSecret: authEnvConfig.ClientSecret,
-
-		JwtSecret: []byte(authEnvConfig.JwtSecret),
-		JwtIssuer: authEnvConfig.JwtIssuer,
 	}
 
 	service, err := sponsor.New(authConfig, staticFiles)

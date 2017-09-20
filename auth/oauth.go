@@ -31,7 +31,6 @@ func NewOAuth(config *Config) (*OAuth, error) {
 	router.HandleFunc(login, auth.handleLogin)
 	router.HandleFunc(callback, auth.handleCallback)
 	router.HandleFunc(logout, auth.handleLogout)
-	router.Handle(token, RequireAuth(auth, getToken(auth.auth)))
 
 	auth.router = router
 
@@ -44,10 +43,6 @@ func (auth *OAuth) baseUrl() string {
 
 func (auth *OAuth) session(r *http.Request, sessionKey string) (*sessions.Session, error) {
 	return auth.store.Get(r, sessionKey)
-}
-
-func (auth *OAuth) jwtConf() jwtConfig {
-	return auth.jwt
 }
 
 func (auth *OAuth) Handler() http.Handler {

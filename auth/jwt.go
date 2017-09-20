@@ -8,6 +8,7 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/docsocsf/sponsor-portal/config"
 )
 
 const expiryTime = 3 * time.Hour
@@ -18,18 +19,33 @@ type Claims struct {
 	User UserIdentifier `json:"user,omitempty"`
 }
 
-func getToken(auth auth) http.Handler {
+var (
+	issuer string
+	secret []byte
+)
+
+func init() {
+	authEnvConfig, err := config.GetAuth()
+	if err != nil {
+		log.Fatal(err, "Make jwt service")
+	}
+
+	issuer = authEnvConfig.JwtIssuer
+	secret = []byte(authEnvConfig.JwtSecret)
+}
+
+func GetToken() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		claims := Claims{
 			jwt.StandardClaims{
-				Issuer:    auth.jwt.issuer,
+				Issuer:    issuer,
 				ExpiresAt: getExpiry(),
 			},
 			User(r),
 		}
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-		json, err := token.SignedString(auth.jwt.secret)
+		json, err := token.SignedString(secret)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -51,7 +67,7 @@ func RequireJWT(auth Auth, inner http.Handler) http.Handler {
 				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 			}
 
-			return auth.jwtConf().secret, nil
+			return secret, nil
 		})
 		if err != nil {
 			log.Println(err)

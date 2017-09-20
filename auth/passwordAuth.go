@@ -17,7 +17,6 @@ func NewPasswordAuth(config *Config) (*PasswordAuth, error) {
 	router.HandleFunc(login, auth.handleLogin).Methods(http.MethodPost)
 	router.HandleFunc(callback, auth.handleCallback)
 	router.HandleFunc(logout, auth.handleLogout)
-	router.Handle(token, RequireAuth(auth, getToken(*auth)))
 
 	auth.router = router
 
@@ -30,10 +29,6 @@ func (auth *PasswordAuth) baseUrl() string {
 
 func (auth *PasswordAuth) session(r *http.Request, sessionKey string) (*sessions.Session, error) {
 	return auth.store.Get(r, sessionKey)
-}
-
-func (auth *PasswordAuth) jwtConf() jwtConfig {
-	return auth.jwt
 }
 
 func (auth *PasswordAuth) Handler() http.Handler {

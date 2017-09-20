@@ -7,15 +7,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (s *Service) defineRoutes(r *mux.Router) {
+func (s *Service) defineRoutes(r *mux.Router, web http.Handler) {
 	// auth
 	r.PathPrefix("/auth").Handler(http.StripPrefix("/sponsors/auth", s.Auth.Handler()))
 
-	r.Handle("/", auth.RequireAuth(s.Auth, indexHandler(s)))
-}
-
-func indexHandler(s *Service) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, s.staticFiles+"/sponsors.html")
-	})
+	r.Handle("/", auth.RequireAuth("/login", web))
 }

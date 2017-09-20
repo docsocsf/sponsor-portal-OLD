@@ -11,6 +11,8 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	_ "github.com/joho/godotenv/autoload"
+
+	"github.com/docsocsf/sponsor-portal/auth"
 )
 
 func main() {
@@ -20,17 +22,18 @@ func main() {
 		log.Fatal(err)
 	}
 
+	root := home(host.StaticFiles)
 	r := mux.NewRouter().StrictSlash(true)
 
 	student := makeStudentService(host.StaticFiles)
-	student.Handle(r)
+	student.Handle(r, root)
 
 	sponsor := makeSponsorService(host.StaticFiles)
-	sponsor.Handle(r)
+	sponsor.Handle(r, root)
+
+	r.Handle("/jwt/token", auth.RequireAuth("/", auth.GetToken()))
 
 	assets := http.FileServer(http.Dir(host.StaticFiles))
-	root := home(host.StaticFiles)
-
 	r.PathPrefix("/assets").Handler(assets)
 	r.Handle("/", root)
 	r.Handle("/login", root)

@@ -1,6 +1,8 @@
 package student
 
 import (
+	"net/http"
+
 	"github.com/docsocsf/sponsor-portal/auth"
 	"github.com/docsocsf/sponsor-portal/config"
 	"github.com/docsocsf/sponsor-portal/model"
@@ -47,6 +49,6 @@ func (s *Service) SetupDatabase(dbConfig config.Database) error {
 	return nil
 }
 
-func (s *Service) Handle(r *mux.Router) {
-	s.defineRoutes(r.PathPrefix("/students").Subrouter())
+func (s *Service) Handle(r *mux.Router, web http.Handler) {
+	s.defineRoutes(r.PathPrefix("/students").Subrouter(), web)
 }

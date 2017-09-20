@@ -15,15 +15,10 @@ func makeStudentService(staticFiles string) *student.Service {
 	}
 
 	authConfig := &auth.Config{
-		CookieSecret: []byte(authEnvConfig.CookieSecret),
-
 		BaseURL:      authEnvConfig.BaseURL + "/students/auth",
 		Issuer:       authEnvConfig.Issuer,
 		ClientID:     authEnvConfig.ClientID,
 		ClientSecret: authEnvConfig.ClientSecret,
-
-		JwtSecret: []byte(authEnvConfig.JwtSecret),
-		JwtIssuer: authEnvConfig.JwtIssuer,
 	}
 
 	service, err := student.New(authConfig, staticFiles)

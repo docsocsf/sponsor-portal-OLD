@@ -11,8 +11,8 @@ type UserIdentifier interface{}
 
 var userSessionKey = "user"
 
-func getCurrentUser(auth Auth, r *http.Request) (UserIdentifier, error) {
-	session, err := auth.session(r, sessionKey)
+func getCurrentUser(r *http.Request) (UserIdentifier, error) {
+	session, err := cookieJar.Get(r, sessionKey)
 	if err != nil {
 		return nil, err
 	}
