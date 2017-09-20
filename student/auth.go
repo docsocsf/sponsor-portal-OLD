@@ -6,7 +6,14 @@ import (
 
 	"github.com/docsocsf/sponsor-portal/auth"
 	"github.com/docsocsf/sponsor-portal/model"
+	"github.com/egnwd/roles"
 )
+
+const role = "student"
+
+func init() {
+	roles.Register(role, auth.RoleChecker(role))
+}
 
 func (s *Service) setupAuth(config *auth.Config) (err error) {
 	if config.Get == nil {
@@ -28,7 +35,7 @@ func (s *Service) setupAuth(config *auth.Config) (err error) {
 	return
 }
 
-func (s *Service) authHandler(info auth.UserInfo) (auth.UserIdentifier, error) {
+func (s *Service) authHandler(info auth.UserInfo) (*auth.UserIdentifier, error) {
 	userModel := model.User{
 		Name: info.Name,
 		Auth: &model.UserAuth{
@@ -41,7 +48,9 @@ func (s *Service) authHandler(info auth.UserInfo) (auth.UserIdentifier, error) {
 		return nil, err
 	}
 
-	return user.Id, nil
+	id := auth.UserIdentifier{user.Id, role}
+
+	return &id, nil
 }
 
 func (s *Service) authSuccessHandler(w http.ResponseWriter, r *http.Request) {

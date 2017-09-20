@@ -44,7 +44,7 @@ const (
 
 func (c *cvImpl) Get(id auth.UserIdentifier) (CV, error) {
 	cv := CV{}
-	err := c.db.QueryRow(getCV, id).Scan(&cv.Name, &cv.File)
+	err := c.db.QueryRow(getCV, id.User).Scan(&cv.Name, &cv.File)
 
 	switch {
 	case err == sql.ErrNoRows:
@@ -57,6 +57,6 @@ func (c *cvImpl) Get(id auth.UserIdentifier) (CV, error) {
 }
 
 func (c *cvImpl) Put(id auth.UserIdentifier, cv CV) error {
-	_, err := c.db.Exec(insertCV, id, cv.Name, cv.File)
+	_, err := c.db.Exec(insertCV, id.User, cv.Name, cv.File)
 	return err
 }

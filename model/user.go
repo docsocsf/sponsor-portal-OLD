@@ -48,7 +48,7 @@ func NewUserReader(db *sql.DB) UserReader {
 
 func (u userImpl) GetById(id auth.UserIdentifier) (User, error) {
 	user := User{Auth: &UserAuth{}}
-	err := u.db.QueryRow(getUserById, id).Scan(&user.Id, &user.Name, &user.Auth.Email)
+	err := u.db.QueryRow(getUserById, id.User).Scan(&user.Id, &user.Name, &user.Auth.Email)
 
 	switch {
 	case err == sql.ErrNoRows:

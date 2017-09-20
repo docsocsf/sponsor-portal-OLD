@@ -1,8 +1,7 @@
 import React from 'react';
 import FileUploadDialog from 'Components/FileUploadDialog';
-import request from 'request-promise-native';
+import request from 'superagent';
 import getJWTHeader from '../../jwt';
-import fs from 'file-system';
 
 export default class StudentProfile extends React.Component {
   constructor() {
@@ -44,21 +43,21 @@ export default class StudentProfile extends React.Component {
       throw new Error("Expecting exactly 1 CV")
     }
 
-    let headers = await getJWTHeader("/students/auth/jwt/token");
+    let headers = await getJWTHeader();
 
     try {
-      let data = await request({
-        method: "POST",
-        uri: "/students/api/cv",
-        headers,
-        formData: {
-          cv: fs.createReadStream(files[0]),
-        }
-      });
+      let data = await request
+        .post('/students/api/cv')
+        .set(headers)
+        .attach('cv', files[0]).
+        on('progress', event => {
+          progress(event.percent);
+        });
 
       this.setState({upload: false})
     } catch (e) {
       console.log(e)
+      console.log("inspect", fs)
       throw new Error("Failed to upload file")
     }
   }

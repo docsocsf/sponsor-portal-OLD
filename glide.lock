@@ -1,14 +1,46 @@
-hash: 9c6c44b05a42b39232d3e4327985ffbdf0f22cf1da5565301b59b5517050a2eb
-updated: 2017-07-22T21:27:25.866581028+01:00
+hash: 1d52009664bff8c9ee28ca8a9f96dd0401600662bbd6e8c5e590fe66d1c8b49a
+updated: 2017-09-21T00:22:50.662717045+01:00
 imports:
 - name: cloud.google.com/go
   version: d2bf9ead8d595b9347434a2bcbaec6395862adab
   subpackages:
   - compute/metadata
+- name: github.com/aws/aws-sdk-go
+  version: 61b379ef486ea3baa55e10c358f3217f06e7b5ad
+  subpackages:
+  - aws
+  - aws/awserr
+  - aws/awsutil
+  - aws/client
+  - aws/client/metadata
+  - aws/corehandlers
+  - aws/credentials
+  - aws/credentials/ec2rolecreds
+  - aws/credentials/endpointcreds
+  - aws/credentials/stscreds
+  - aws/defaults
+  - aws/ec2metadata
+  - aws/endpoints
+  - aws/request
+  - aws/session
+  - aws/signer/v4
+  - internal/shareddefaults
+  - private/protocol
+  - private/protocol/query
+  - private/protocol/query/queryutil
+  - private/protocol/rest
+  - private/protocol/restxml
+  - private/protocol/xml/xmlutil
+  - service/s3
+  - service/sts
 - name: github.com/caarlos0/env
   version: 0cf029d5748c52beb2c9d20c81880cb4bdf8f788
 - name: github.com/dgrijalva/jwt-go
   version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
+- name: github.com/egnwd/roles
+  version: 46e4e74dbd799f2017a876337d7121bf24c27f57
+- name: github.com/go-ini/ini
+  version: 74bdc99692c3408cb103221e38675ce8fda0a718
 - name: github.com/golang/protobuf
   version: 5a0f697c9ed9d68fef0116532c6e05cfeae00e55
   subpackages:
@@ -18,11 +50,13 @@ imports:
 - name: github.com/gorilla/handlers
   version: a4d79d4487c2430a17d9dc8a1f74d1a6ed6908ca
 - name: github.com/gorilla/mux
-  version: bcd8bc72b08df0f70df986b97f95590779502d31
+  version: 24fca303ac6da784b9e8269f724ddeb0b2eea5e7
 - name: github.com/gorilla/securecookie
   version: e59506cc896acb7f7bf732d4fdf5e25f7ccd8983
 - name: github.com/gorilla/sessions
   version: ca9ada44574153444b00d3fd9c8559e4cc95f896
+- name: github.com/jmespath/go-jmespath
+  version: bd40a432e4c76585ef6b72d3fd96fb9b6dc7b68d
 - name: github.com/joho/godotenv
   version: 3ddb2792f3923947290c4932990136e17852a078
   subpackages:
@@ -31,6 +65,11 @@ imports:
   version: ba5d4f7a35561e22fbdf7a39aa0070f4d460cfc0
   subpackages:
   - oid
+- name: golang.org/x/crypto
+  version: 7d9177d70076375b9a59c8fde23d52d9c4a7ecd5
+  subpackages:
+  - bcrypt
+  - blowfish
 - name: golang.org/x/net
   version: 59a0b19b5533c7977ddeb86b017bf507ed407b12
   subpackages:

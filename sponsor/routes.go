@@ -11,5 +11,5 @@ func (s *Service) defineRoutes(r *mux.Router, web http.Handler) {
 	// auth
 	r.PathPrefix("/auth").Handler(http.StripPrefix("/sponsors/auth", s.Auth.Handler()))
 
-	r.Handle("/", auth.RequireAuth("/login", web))
+	r.Handle("/", auth.RequireAuth(web, "/login", role))
 }

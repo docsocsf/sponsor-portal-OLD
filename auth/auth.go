@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	oauthService "google.golang.org/api/oauth2/v2"
+	"github.com/egnwd/roles"
 
 	"github.com/docsocsf/sponsor-portal/config"
 )
@@ -31,7 +32,7 @@ type auth struct {
 	store   *sessions.CookieStore
 	baseURL string
 
-	get func(info UserInfo) (UserIdentifier, error)
+	get func(info UserInfo) (*UserIdentifier, error)
 
 	successHandler    http.Handler
 	failureHandler    http.Handler
@@ -87,4 +88,18 @@ func newAuth(config *Config) auth {
 
 func PasswordCorrect(password, hashedPassword string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password)) == nil
+}
+
+func RoleChecker(role string) roles.Checker {
+	log.Println("Creating " + role)
+	return roles.Checker(func(req *http.Request, user interface{}) bool {
+		if user != nil {
+			log.Println(user.(*UserIdentifier))
+			if id, ok := user.(*UserIdentifier); ok {
+				return id.Role == role
+			}
+		}
+
+		return false
+	})
 }

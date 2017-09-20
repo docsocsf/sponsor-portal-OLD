@@ -1,17 +1,25 @@
 package auth
 
 import (
+	"encoding/gob"
 	"errors"
 	"fmt"
 	"net/http"
 	"reflect"
 )
 
-type UserIdentifier interface{}
+type UserIdentifier struct {
+	User int64  `json:"user,omitempty"`
+	Role string `json:"role"`
+}
+
+func init() {
+	gob.Register(UserIdentifier{})
+}
 
 var userSessionKey = "user"
 
-func getCurrentUser(r *http.Request) (UserIdentifier, error) {
+func getCurrentUser(r *http.Request) (*UserIdentifier, error) {
 	session, err := cookieJar.Get(r, sessionKey)
 	if err != nil {
 		return nil, err
@@ -19,7 +27,7 @@ func getCurrentUser(r *http.Request) (UserIdentifier, error) {
 
 	if value, ok := session.Values[userSessionKey]; ok {
 		if userId, ok := value.(UserIdentifier); ok {
-			return userId, nil
+			return &userId, nil
 		}
 
 		return nil, errors.New(fmt.Sprintf("Got user but was wrong type, expected: *UserIdentifier, actual: %v", reflect.ValueOf(value).Type().PkgPath()))
@@ -28,13 +36,13 @@ func getCurrentUser(r *http.Request) (UserIdentifier, error) {
 	return nil, nil
 }
 
-func setCurrentUser(auth Auth, w http.ResponseWriter, r *http.Request, userID UserIdentifier) error {
+func setCurrentUser(auth Auth, w http.ResponseWriter, r *http.Request, userID *UserIdentifier) error {
 	session, err := auth.session(r, sessionKey)
 	if err != nil {
 		return err
 	}
 
-	session.Values[userSessionKey] = userID
+	session.Values[userSessionKey] = *userID
 
 	err = session.Save(r, w)
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/docsocsf/sponsor-portal/config"
+	"github.com/egnwd/roles"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	_ "github.com/joho/godotenv/autoload"
@@ -31,7 +32,7 @@ func main() {
 	sponsor := makeSponsorService(host.StaticFiles)
 	sponsor.Handle(r, root)
 
-	r.Handle("/jwt/token", auth.RequireAuth("/", auth.GetToken()))
+	r.Handle("/jwt/token", auth.RequireAuth(auth.GetToken(), "/", roles.Anyone))
 
 	assets := http.FileServer(http.Dir(host.StaticFiles))
 	r.PathPrefix("/assets").Handler(assets)

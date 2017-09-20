@@ -10,7 +10,7 @@ type Config struct {
 	ClientID     string
 	ClientSecret string
 
-	Get func(info UserInfo) (UserIdentifier, error)
+	Get func(info UserInfo) (*UserIdentifier, error)
 
 	SuccessHandler    http.Handler
 	FailureHandler    http.Handler

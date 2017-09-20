@@ -4,27 +4,29 @@ import (
 	"context"
 	"log"
 	"net/http"
+
+	"github.com/egnwd/roles"
 )
 
 type userKeyType int
 
 const userKey userKeyType = iota
 
-func setRequestUser(r *http.Request, userId UserIdentifier) *http.Request {
-	return r.WithContext(context.WithValue(r.Context(), userKey, userId))
+func setRequestUser(r *http.Request, userId *UserIdentifier) *http.Request {
+	return r.WithContext(context.WithValue(r.Context(), userKey, *userId))
 }
 
-func User(r *http.Request) UserIdentifier {
+func User(r *http.Request) *UserIdentifier {
 	userId := r.Context().Value(userKey)
 
-	if userId == nil {
-		return nil
+	if user, ok := userId.(UserIdentifier); ok {
+		return &user
 	}
 
-	return userId.(UserIdentifier)
+	return nil
 }
 
-func RequireAuth(redirect string, inner http.Handler) http.Handler {
+func RequireAuth(inner http.Handler, redirect string, validRoles ...string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userId, err := getCurrentUser(r)
 		if err != nil {
@@ -35,6 +37,13 @@ func RequireAuth(redirect string, inner http.Handler) http.Handler {
 
 		if userId == nil {
 			http.Redirect(w, r, redirect, http.StatusTemporaryRedirect)
+			return
+		}
+
+		log.Println(userId, validRoles)
+
+		if !roles.HasRole(r, userId, validRoles...) {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
 
