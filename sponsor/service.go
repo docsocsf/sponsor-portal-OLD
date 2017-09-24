@@ -13,7 +13,10 @@ type Service struct {
 	staticFiles string
 
 	Auth auth.Auth
+	s3   *model.S3
+
 	model.UserReader
+	model.CVReader
 }
 
 func New(authConfig *auth.Config, staticFiles string) (*Service, error) {
@@ -35,8 +38,13 @@ func (s *Service) SetupDatabase(dbConfig config.Database) error {
 	}
 
 	s.UserReader = model.NewUserReader(db)
+	s.CVReader = model.NewCVReader(db)
 
 	return nil
+}
+
+func (s *Service) SetupStorer(s3Config config.S3) {
+	s.s3 = model.NewS3(s3Config.Aws, s3Config.Bucket, s3Config.Prefix)
 }
 
 func (s *Service) Handle(r *mux.Router, web http.Handler) {

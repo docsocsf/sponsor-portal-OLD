@@ -91,10 +91,8 @@ func PasswordCorrect(password, hashedPassword string) bool {
 }
 
 func RoleChecker(role string) roles.Checker {
-	log.Println("Creating " + role)
 	return roles.Checker(func(req *http.Request, user interface{}) bool {
 		if user != nil {
-			log.Println(user.(*UserIdentifier))
 			if id, ok := user.(*UserIdentifier); ok {
 				return id.Role == role
 			}

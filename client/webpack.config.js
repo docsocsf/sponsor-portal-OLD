@@ -32,6 +32,14 @@ module.exports = {
         loader: ["babel-loader"]
       },
       {
+        test: /\.css$/,
+        use: extractSass.extract({
+          use: [{
+            loader: 'css-loader'
+          }]
+        })
+      },
+      {
         test: /\.scss$/,
         use: extractSass.extract({
           use: [{

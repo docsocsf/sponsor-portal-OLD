@@ -32,12 +32,13 @@ func main() {
 	sponsor := makeSponsorService(host.StaticFiles)
 	sponsor.Handle(r, root)
 
-	r.Handle("/jwt/token", auth.RequireAuth(auth.GetToken(), "/", roles.Anyone))
+	r.Handle("/jwt/token", auth.RequireAuth(auth.GetToken(false), "/", roles.Anyone))
+	r.Handle("/jwt/onetime-token", auth.RequireAuth(auth.GetToken(true), "/", roles.Anyone))
 
 	assets := http.FileServer(http.Dir(host.StaticFiles))
 	r.PathPrefix("/assets").Handler(assets)
 	r.Handle("/", root)
-	r.Handle("/login", root)
+	r.Handle("/login", auth.NoAuth(root, "/sponsors", "sponsor"))
 
 	log.Printf("Listening on %s...", host.Port)
 	log.Fatal(http.ListenAndServe(host.Port, handlers.LoggingHandler(os.Stdout, r)))

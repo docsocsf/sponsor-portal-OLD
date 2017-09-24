@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import '../style/students.scss';
 import Students from 'Views/Students';
 import fetchWithConfig from './fetch';
-import getJWTHeader from './jwt';
+import { getJWTHeader } from './jwt';
 
 const endpoint = "/students/auth/jwt/token";
 

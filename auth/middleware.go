@@ -40,8 +40,6 @@ func RequireAuth(inner http.Handler, redirect string, validRoles ...string) http
 			return
 		}
 
-		log.Println(userId, validRoles)
-
 		if !roles.HasRole(r, userId, validRoles...) {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
@@ -49,5 +47,24 @@ func RequireAuth(inner http.Handler, redirect string, validRoles ...string) http
 
 		rWithUser := setRequestUser(r, userId)
 		inner.ServeHTTP(w, rWithUser)
+	})
+}
+
+func NoAuth(inner http.Handler, redirect string, validRoles ...string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userId, err := getCurrentUser(r)
+		if err != nil {
+			log.Printf("Failed to get the current user from request: %v\n", r)
+			http.Error(w, "Failed to get current user", http.StatusInternalServerError)
+			return
+		}
+
+		if userId == nil || !roles.HasRole(r, userId, validRoles...) {
+			inner.ServeHTTP(w, r)
+			return
+		}
+
+		rWithUser := setRequestUser(r, userId)
+		http.Redirect(w, rWithUser, redirect, http.StatusSeeOther)
 	})
 }

@@ -55,7 +55,7 @@ func (s *Service) uploadCV(w http.ResponseWriter, r *http.Request) {
 
 func (s *Service) getCV(w http.ResponseWriter, r *http.Request) {
 	id := auth.User(r)
-	cv, err := s.CVReader.Get(*id)
+	cv, err := s.CVReader.Get(id.User)
 	if err != nil {
 		switch e := err.(type) {
 		case model.DbError:
