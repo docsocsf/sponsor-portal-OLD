@@ -1,7 +1,7 @@
 import React from 'react';
 import FileUploadDialog from 'Components/FileUploadDialog';
 import request from 'superagent';
-import getJWTHeader from '../../jwt';
+import { getJWTHeader } from '../../jwt';
 
 export default class StudentProfile extends React.Component {
   constructor() {
@@ -30,12 +30,11 @@ export default class StudentProfile extends React.Component {
   async getCV() {
     try {
       const cv = await this.props.fetchCV()
+      if (!cv) return
       this.setState({cv, upload: false})
       this.fileRef.updateFile([cv])
     } catch (e) {
-      if (e.status !== 404) {
-        console.log("fetch cv", e)
-      }
+      console.log("fetch cv", e)
     }
   }
 
@@ -44,7 +43,7 @@ export default class StudentProfile extends React.Component {
       throw new Error("Expecting exactly 1 CV")
     }
 
-    let headers = await getJWTHeader("/students/auth/jwt/token");
+    let headers = await getJWTHeader();
 
     try {
       let data = await request
@@ -54,6 +53,7 @@ export default class StudentProfile extends React.Component {
         on('progress', event => {
           progress(event.percent);
         });
+
       this.setState({upload: false})
     } catch (e) {
       console.log(e)

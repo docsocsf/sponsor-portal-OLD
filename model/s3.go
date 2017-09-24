@@ -9,6 +9,7 @@ import (
 	"path"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
@@ -48,4 +49,29 @@ func (s *S3) Put(key string, data io.Reader) error {
 		ContentType: aws.String(mime.TypeByExtension(path.Ext(key))),
 	})
 	return err
+}
+
+func (s *S3) Get(key string) (*s3.GetObjectOutput, error) {
+	log.Printf("Getting file '%s' from '%s'\n", key, s.bucket)
+	input := &s3.GetObjectInput{
+		Bucket: aws.String(s.bucket),
+		Key:    aws.String(s.prefix + key),
+	}
+
+	result, err := s.service.GetObject(input)
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case s3.ErrCodeNoSuchKey:
+				log.Println(s3.ErrCodeNoSuchKey, aerr.Error())
+				return nil, DbError{true, aerr}
+			default:
+				log.Println(aerr.Error())
+			}
+		}
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return result, nil
 }

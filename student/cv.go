@@ -43,7 +43,7 @@ func (s *Service) uploadCV(w http.ResponseWriter, r *http.Request) {
 
 	id := auth.User(r)
 	cv := model.CV{Name: header.Filename, File: key}
-	err = s.CVWriter.Put(id, cv)
+	err = s.CVWriter.Put(*id, cv)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -55,12 +55,11 @@ func (s *Service) uploadCV(w http.ResponseWriter, r *http.Request) {
 
 func (s *Service) getCV(w http.ResponseWriter, r *http.Request) {
 	id := auth.User(r)
-	cv, err := s.CVReader.Get(id)
+	cv, err := s.CVReader.Get(id.User)
 	if err != nil {
 		switch e := err.(type) {
 		case model.DbError:
 			if e.NotFound {
-				http.Error(w, err.Error(), http.StatusNotFound)
 				return
 			}
 		}

@@ -5,23 +5,23 @@ import (
 
 	"github.com/docsocsf/sponsor-portal/auth"
 	"github.com/docsocsf/sponsor-portal/config"
-	"github.com/docsocsf/sponsor-portal/student"
+	"github.com/docsocsf/sponsor-portal/sponsor"
 )
 
-func makeStudentService(staticFiles string) *student.Service {
+func makeSponsorService(staticFiles string) *sponsor.Service {
 	authEnvConfig, err := config.GetAuth()
 	if err != nil {
-		log.Fatal(err, "Make student service")
+		log.Fatal(err, "Make sponsor service")
 	}
 
 	authConfig := &auth.Config{
-		BaseURL:      authEnvConfig.BaseURL + "/students/auth",
+		BaseURL:      authEnvConfig.BaseURL,
 		Issuer:       authEnvConfig.Issuer,
 		ClientID:     authEnvConfig.ClientID,
 		ClientSecret: authEnvConfig.ClientSecret,
 	}
 
-	service, err := student.New(authConfig, staticFiles)
+	service, err := sponsor.New(authConfig, staticFiles)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -3,9 +3,10 @@ package auth
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"errors"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/sessions"
 )
 
 const (
@@ -19,37 +20,49 @@ func randToken() string {
 	return base64.StdEncoding.EncodeToString(b)
 }
 
-func (auth *Auth) generateAndStoreState(w http.ResponseWriter, r *http.Request) (string, error) {
-	state := randToken()
-
-	session, err := auth.store.Get(r, sessionKey)
+func generateAndStoreState(auth Auth, w http.ResponseWriter, r *http.Request) (string, error) {
+	session, err := auth.session(r, sessionKey)
 	if err != nil {
 		log.Println(err)
-	}
-
-	session.Values[stateKey] = state
-
-	err = session.Save(r, w)
-	if err != nil {
-		log.Println("Saving")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return "", err
 	}
 
-	return state, nil
+	return generateAndStore(stateKey, session, w, r)
 }
 
-func (auth *Auth) getAndDeleteState(w http.ResponseWriter, r *http.Request) (string, error) {
-	session, err := auth.store.Get(r, sessionKey)
+func getAndDeleteState(auth Auth, w http.ResponseWriter, r *http.Request) (string, error) {
+	session, err := auth.session(r, sessionKey)
 	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return "", err
 	}
 
-	state, ok := session.Values[stateKey]
-	if !ok {
-		return "", errors.New("Failed to get session")
-	}
-	delete(session.Values, stateKey)
+	return getAndDelete(stateKey, session, w, r)
+}
 
-	err = session.Save(r, w)
-	return state.(string), err
+func generateAndStore(key string, session *sessions.Session, w http.ResponseWriter, r *http.Request) (string, error) {
+	value := randToken()
+
+	session.Values[key] = value
+
+	err := session.Save(r, w)
+	if err != nil {
+		log.Println("Saving " + key)
+		return "", err
+	}
+
+	return value, nil
+}
+
+func getAndDelete(key string, session *sessions.Session, w http.ResponseWriter, r *http.Request) (string, error) {
+	value, ok := session.Values[key]
+	if !ok {
+		return "", nil
+	}
+	delete(session.Values, key)
+
+	err := session.Save(r, w)
+	return value.(string), err
 }

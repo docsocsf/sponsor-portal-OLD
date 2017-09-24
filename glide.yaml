@@ -7,3 +7,5 @@ import:
 - package: github.com/gorilla/mux
   version: ^1.4.0
 - package: google.golang.org/api
+- package: github.com/egnwd/roles
+  version: ^1.0.1

@@ -1,6 +1,7 @@
-package student
+package sponsor
 
 import (
+	"errors"
 	"net/http"
 	"net/url"
 
@@ -9,7 +10,7 @@ import (
 	"github.com/egnwd/roles"
 )
 
-const role = "student"
+const role = "sponsor"
 
 func init() {
 	roles.Register(role, auth.RoleChecker(role))
@@ -30,17 +31,25 @@ func (s *Service) setupAuth(config *auth.Config) (err error) {
 		config.PostLogoutHandler = http.HandlerFunc(s.authPostLogoutHandler)
 	}
 
-	s.Auth, err = auth.NewOAuth(config)
+	s.Auth, err = auth.NewPasswordAuth(config)
 
 	return
 }
 
 func (s *Service) authHandler(info auth.UserInfo) (*auth.UserIdentifier, error) {
 	userModel := model.User{
-		Name: info.Name,
 		Auth: &model.UserAuth{
 			Email: info.Email,
 		},
+	}
+
+	hashedPassword, err := s.UserReader.HashedPassword(info.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if !auth.PasswordCorrect(info.Password, hashedPassword) {
+		return nil, errors.New("Incorrect password")
 	}
 
 	user, err := s.UserReader.Get(userModel)
@@ -54,7 +63,7 @@ func (s *Service) authHandler(info auth.UserInfo) (*auth.UserIdentifier, error) 
 }
 
 func (s *Service) authSuccessHandler(w http.ResponseWriter, r *http.Request) {
-	redirect(w, r, "/students")
+	redirect(w, r, "/sponsors/")
 }
 
 func (s *Service) authFailureHandler(w http.ResponseWriter, r *http.Request) {
@@ -65,6 +74,7 @@ func (s *Service) authPostLogoutHandler(w http.ResponseWriter, r *http.Request) 
 	redirect(w, r, "/")
 }
 
+// TODO: dedupe
 func redirect(w http.ResponseWriter, r *http.Request, to string) {
 	newUri, err := url.Parse(to)
 	if err != nil {

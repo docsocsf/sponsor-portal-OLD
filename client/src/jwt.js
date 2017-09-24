@@ -1,16 +1,17 @@
 import memoize from 'promise-memoize';
 import fetchWithConfig from './fetch';
 
-const getJWTHeader = async (endpoint, hdr) => {
-  const token = await getToken(endpoint);
+export const generalToken = "/jwt/token"
+export const onetimeToken = "/jwt/onetime-token"
+
+export const getJWTHeader = async (hdr) => {
+  const token = await getToken(generalToken);
 
   return {...hdr, Authorization: `Bearer ${token}`}
 }
 
-const getToken = memoize(async (endpoint) => {
+export const getToken = memoize(async (endpoint) => {
   const resp = await fetchWithConfig(endpoint);
-
   return resp.text;
 }, {maxAge: 60000});
 
-export default getJWTHeader;

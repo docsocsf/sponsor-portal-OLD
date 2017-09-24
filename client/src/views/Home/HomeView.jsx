@@ -1,15 +1,11 @@
 import React from 'react';
+import Header from 'Components/Header';
 
 export default class HomeView extends React.Component {
   render() {
     return (
       <div>
-        <header id="home">
-          <img className="home logo" src="/images/docsoc-sf-logo.svg" width="120"/>
-          <h1>
-            DoCSoc<br/ >Sponsor Portal
-          </h1>
-        </header>
+        <Header />
         <p>
           Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
           tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At
@@ -28,7 +24,9 @@ export default class HomeView extends React.Component {
             </a>
           </button>
           <button className="sponsor">
-            Login as a DoCSoc sponsor
+            <a href="/login">
+              Login as a DoCSoc sponsor
+            </a>
           </button>
         </div>
       </div>

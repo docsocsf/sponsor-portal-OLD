@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql"
 	"errors"
+	"log"
 
 	"github.com/docsocsf/sponsor-portal/auth"
 )
@@ -20,6 +21,7 @@ type UserAuth struct {
 type UserReader interface {
 	Get(User) (User, error)
 	GetById(auth.UserIdentifier) (User, error)
+	HashedPassword(email string) (string, error)
 }
 
 const (
@@ -29,6 +31,10 @@ const (
 
 	getUserById = `
 	SELECT id, name, email FROM users WHERE id=$1
+	`
+
+	getHashedPassword = `
+	SELECT hashed_password FROM users WHERE email=$1
 	`
 )
 
@@ -42,7 +48,7 @@ func NewUserReader(db *sql.DB) UserReader {
 
 func (u userImpl) GetById(id auth.UserIdentifier) (User, error) {
 	user := User{Auth: &UserAuth{}}
-	err := u.db.QueryRow(getUserById, id).Scan(&user.Id, &user.Name, &user.Auth.Email)
+	err := u.db.QueryRow(getUserById, id.User).Scan(&user.Id, &user.Name, &user.Auth.Email)
 
 	switch {
 	case err == sql.ErrNoRows:
@@ -64,5 +70,21 @@ func (u userImpl) Get(user User) (User, error) {
 		return User{}, err
 	default:
 		return user, nil
+	}
+}
+
+func (u userImpl) HashedPassword(email string) (string, error) {
+	log.Printf("Checking password for '%s'\n", email)
+
+	var password string
+	err := u.db.QueryRow(getHashedPassword, email).Scan(&password)
+
+	switch {
+	case err == sql.ErrNoRows:
+		return "", errors.New("User does not exist")
+	case err != nil:
+		return "", err
+	default:
+		return password, nil
 	}
 }

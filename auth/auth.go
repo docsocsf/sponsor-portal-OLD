@@ -1,87 +1,102 @@
 package auth
 
 import (
+	"log"
 	"net/http"
+
+	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/oauth2"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 	oauthService "google.golang.org/api/oauth2/v2"
+	"github.com/egnwd/roles"
+
+	"github.com/docsocsf/sponsor-portal/config"
 )
 
-type Auth struct {
+type Auth interface {
+	//Handlers
+	Handler() http.Handler
+	handleCallback(w http.ResponseWriter, r *http.Request)
+	handleLogin(w http.ResponseWriter, r *http.Request)
+	handleLogout(w http.ResponseWriter, r *http.Request)
+
+	baseUrl() string
+	session(r *http.Request, sessionKey string) (*sessions.Session, error)
+}
+
+type auth struct {
 	router *mux.Router
 
-	store   sessions.Store
+	store   *sessions.CookieStore
 	baseURL string
 
-	oauth *oauth2.Config
-
-	get func(info UserInfo) (UserIdentifier, error)
+	get func(info UserInfo) (*UserIdentifier, error)
 
 	successHandler    http.Handler
 	failureHandler    http.Handler
 	postLogoutHandler http.Handler
 
-	jwt jwtConfig
 }
 
-type jwtConfig struct {
-	secret []byte
-	issuer string
+type OAuth struct {
+	auth
+	oauth *oauth2.Config
 }
+
+type PasswordAuth = auth
+
+var scopes = []string{oauthService.UserinfoEmailScope, oauthService.UserinfoProfileScope}
 
 const (
 	login    = "/login"
 	logout   = "/logout"
 	callback = "/callback"
-	token    = "/jwt/token"
 )
 
-var scopes = []string{oauthService.UserinfoEmailScope, oauthService.UserinfoProfileScope}
+type UserInfoPlus = oauthService.Userinfoplus
 
-type UserInfo *oauthService.Userinfoplus
+type UserInfo struct {
+	*UserInfoPlus
+	Password string
+}
 
-func New(config *Config) (*Auth, error) {
-	auth := &Auth{
-		store:   sessions.NewCookieStore(config.CookieSecret),
+var cookieJar *sessions.CookieStore
+
+func init() {
+	cookieConfig, err := config.GetAuth()
+	if err != nil {
+		log.Fatal("Could not gett cookie secret")
+	}
+	cookieJar = sessions.NewCookieStore([]byte(cookieConfig.CookieSecret))
+}
+
+func newAuth(config *Config) auth {
+	return auth{
+		store:   cookieJar,
 		baseURL: config.BaseURL,
-
-		oauth: &oauth2.Config{
-			ClientID:     config.ClientID,
-			ClientSecret: config.ClientSecret,
-			RedirectURL:  config.BaseURL + callback,
-
-			Endpoint: google.Endpoint,
-
-			Scopes: scopes,
-		},
 
 		get: config.Get,
 
 		successHandler:    config.SuccessHandler,
 		failureHandler:    config.FailureHandler,
 		postLogoutHandler: config.PostLogoutHandler,
-
-		jwt: jwtConfig{
-			secret: config.JwtSecret,
-			issuer: config.JwtIssuer,
-		},
 	}
-
-	router := mux.NewRouter()
-
-	router.HandleFunc(login, auth.handleLogin)
-	router.HandleFunc(callback, auth.handleCallback)
-	router.HandleFunc(logout, auth.handleLogout)
-	router.Handle(token, auth.RequireAuth(http.HandlerFunc(auth.getToken)))
-
-	auth.router = router
-
-	return auth, nil
 }
 
-func (auth *Auth) Handler() http.Handler {
-	return auth.router
+func PasswordCorrect(password, hashedPassword string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password)) == nil
+}
+
+func RoleChecker(role string) roles.Checker {
+	return roles.Checker(func(req *http.Request, user interface{}) bool {
+		if user != nil {
+			if id, ok := user.(*UserIdentifier); ok {
+				return id.Role == role
+			}
+		}
+
+		return false
+	})
 }

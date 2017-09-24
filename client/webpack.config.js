@@ -12,7 +12,6 @@ const polyfill = (...files) => ["babel-polyfill", ...files];
 module.exports = {
   entry: {
     index: polyfill("./src/index.js"),
-    students: polyfill("./src/students.js"),
   },
   output: {
     path: path.resolve("dist/assets"),
@@ -33,6 +32,14 @@ module.exports = {
         loader: ["babel-loader"]
       },
       {
+        test: /\.css$/,
+        use: extractSass.extract({
+          use: [{
+            loader: 'css-loader'
+          }]
+        })
+      },
+      {
         test: /\.scss$/,
         use: extractSass.extract({
           use: [{
@@ -47,5 +54,10 @@ module.exports = {
   },
   plugins: [
     extractSass,
-  ]
+  ],
+  node: {
+    fs: 'empty',
+    net: 'empty',
+    tls: 'empty'
+  }
 };

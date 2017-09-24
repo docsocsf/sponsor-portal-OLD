@@ -3,32 +3,24 @@ package student
 import (
 	"net/http"
 
+	"github.com/docsocsf/sponsor-portal/auth"
 	"github.com/gorilla/mux"
 )
 
-func (s *Service) getRoutes() http.Handler {
-	router := mux.NewRouter()
-
+func (s *Service) defineRoutes(r *mux.Router, web http.Handler) {
 	// auth
-	router.PathPrefix("/auth/").Handler(http.StripPrefix("/auth", s.Auth.Handler()))
+	r.PathPrefix("/auth").Handler(http.StripPrefix("/students/auth", s.Auth.Handler()))
 
-	router.Handle("/", s.Auth.RequireAuth(indexHandler(s)))
-	router.PathPrefix("/api/").Handler(http.StripPrefix("/api", s.getApiRoutes()))
-
-	return router
+	r.Handle("/", auth.RequireAuth(web, "/students/auth/login", role))
+	r.PathPrefix("/api").Handler(http.StripPrefix("/students/api", s.getApiRoutes()))
 }
 
 func (s *Service) getApiRoutes() http.Handler {
 	api := mux.NewRouter()
+
 	api.HandleFunc("/user", s.getUserInformation)
 	api.HandleFunc("/cv", s.uploadCV).Methods(http.MethodPost)
 	api.HandleFunc("/cv", s.getCV).Methods(http.MethodGet)
 
-	return s.Auth.RequireJWT(api)
-}
-
-func indexHandler(s *Service) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, s.staticFiles+"/students.html")
-	})
+	return auth.RequireJWT(api, s.Auth, role)
 }
