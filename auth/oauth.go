@@ -61,7 +61,7 @@ func (auth *OAuth) handleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (auth *OAuth) handleLogout(w http.ResponseWriter, r *http.Request) {
-	err := deleteCurrentUser(auth, w, r)
+	err := deleteCurrentUser(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -121,7 +121,7 @@ func (auth *OAuth) handleCallback(w http.ResponseWriter, r *http.Request) {
 		auth.failureHandler.ServeHTTP(w, r)
 	}
 
-	err = setCurrentUser(auth, w, r, id)
+	err = setCurrentUser(w, r, id)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)

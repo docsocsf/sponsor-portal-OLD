@@ -25,6 +25,8 @@ var (
 	secret []byte
 )
 
+const jtiKey = "jti"
+
 func init() {
 	authEnvConfig, err := config.GetAuth()
 	if err != nil {
@@ -64,7 +66,7 @@ func GetToken(onetime bool) http.Handler {
 				return
 			}
 
-			jti, err := generateAndStore("jti", session, w, r)
+			jti, err := generateAndStore(jtiKey, session, w, r)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -116,14 +118,10 @@ func jwtHandler(inner http.Handler, auth Auth, onetime bool, validRoles ...strin
 				return
 			}
 
-			log.Println("Valid Roles")
-
 			if err = checkJti(claims, onetime, auth, w, r); err != nil {
 				http.Error(w, "Invalid access", http.StatusUnauthorized)
 				return
 			}
-
-			log.Println("Valid JTI")
 
 			rWithUser := setRequestUser(r, &claims.UserIdentifier)
 			inner.ServeHTTP(w, rWithUser)
@@ -156,7 +154,7 @@ func extractJti(auth Auth, w http.ResponseWriter, r *http.Request) (string, erro
 		return "", err
 	}
 
-	return getAndDelete("jti", session, w, r)
+	return getAndDelete(jtiKey, session, w, r)
 }
 
 func checkJti(claims *Claims, onetime bool, auth Auth, w http.ResponseWriter, r *http.Request) error {

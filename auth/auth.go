@@ -53,7 +53,6 @@ const (
 	login    = "/login"
 	logout   = "/logout"
 	callback = "/callback"
-	token    = "/jwt/token"
 )
 
 type UserInfoPlus = oauthService.Userinfoplus

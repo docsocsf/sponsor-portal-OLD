@@ -36,8 +36,8 @@ func getCurrentUser(r *http.Request) (*UserIdentifier, error) {
 	return nil, nil
 }
 
-func setCurrentUser(auth Auth, w http.ResponseWriter, r *http.Request, userID *UserIdentifier) error {
-	session, err := auth.session(r, sessionKey)
+func setCurrentUser(w http.ResponseWriter, r *http.Request, userID *UserIdentifier) error {
+	session, err := cookieJar.Get(r, sessionKey)
 	if err != nil {
 		return err
 	}
@@ -52,8 +52,8 @@ func setCurrentUser(auth Auth, w http.ResponseWriter, r *http.Request, userID *U
 	return nil
 }
 
-func deleteCurrentUser(auth Auth, w http.ResponseWriter, r *http.Request) error {
-	session, err := auth.session(r, sessionKey)
+func deleteCurrentUser(w http.ResponseWriter, r *http.Request) error {
+	session, err := cookieJar.Get(r, sessionKey)
 	if err != nil {
 		return err
 	}

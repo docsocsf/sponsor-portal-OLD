@@ -57,7 +57,6 @@ export default class StudentProfile extends React.Component {
       this.setState({upload: false})
     } catch (e) {
       console.log(e)
-      console.log("inspect", fs)
       throw new Error("Failed to upload file")
     }
   }

@@ -1,7 +1,7 @@
 import React from 'react';
 import Header from 'Components/Header';
 import md5 from 'md5';
-import request from 'request-promise-native';
+import request from 'superagent';
 import {Redirect} from 'react-router';
 
 export default class Login extends React.Component {
@@ -20,14 +20,12 @@ export default class Login extends React.Component {
     let { email, password } = this.state;
     password = md5(password)
     try {
-      console.log("login", email, password);
       let resp = await request
-        .post("http://localhost:8080/sponsors/auth/login", {
-          followRedirect: r => {console.log(r); return false},
-          resolveWithFullResponse: true,
-          form: {email, password}
-        });
-      let redirect = new URL(resp.url).pathname;
+        .post('/sponsors/auth/login')
+        .type('form')
+        .send({ email })
+        .send({ password })
+      let redirect = new URL(resp.xhr.responseURL).pathname;
       this.setState({redirect});
     } catch (e) {
       console.log(e);
@@ -38,9 +36,9 @@ export default class Login extends React.Component {
   handleChange = (event) => this.setState({ [event.target.name]: event.target.value })
 
   render() {
-    let {redirect, error, email, password, nextPathname} = this.state;
+    let {redirect, error, email, password } = this.state;
     if (!!redirect) {
-      return (<Redirect to={nextPathname || redirect} />);
+      return (<Redirect to={redirect} />);
     }
 
     return (

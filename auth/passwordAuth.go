@@ -52,7 +52,7 @@ func (auth *PasswordAuth) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = setCurrentUser(auth, w, r, id)
+	err = setCurrentUser(w, r, id)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -63,7 +63,7 @@ func (auth *PasswordAuth) handleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (auth *PasswordAuth) handleLogout(w http.ResponseWriter, r *http.Request) {
-	err := deleteCurrentUser(auth, w, r)
+	err := deleteCurrentUser(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

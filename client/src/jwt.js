@@ -12,7 +12,6 @@ export const getJWTHeader = async (hdr) => {
 
 export const getToken = memoize(async (endpoint) => {
   const resp = await fetchWithConfig(endpoint);
-
-  return resp;
+  return resp.text;
 }, {maxAge: 60000});
 
