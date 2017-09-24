@@ -1,7 +1,7 @@
 import React from 'react';
 import FileUploadDialog from 'Components/FileUploadDialog';
 import request from 'superagent';
-import getJWTHeader from '../../jwt';
+import { getJWTHeader } from '../../jwt';
 
 export default class StudentProfile extends React.Component {
   constructor() {
