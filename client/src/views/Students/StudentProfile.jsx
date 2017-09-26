@@ -1,5 +1,6 @@
 import React from 'react';
 import FileUploadDialog from 'Components/FileUploadDialog';
+import Header from 'Components/Header';
 import request from 'superagent';
 import { getJWTHeader } from '../../jwt';
 
@@ -63,23 +64,22 @@ export default class StudentProfile extends React.Component {
 
   render() {
     let {user, cv, upload} = this.state;
+
     return (
       <div>
-        <header id="home">
-          <h1>
-            Hello, {user ? user.name : "Student"}!
-          </h1>
-        </header>
-        <section id="cv">
-          <h2>{ cv && !upload ? "Your CV" : "Upload CV"}</h2>
-          <FileUploadDialog
-            accept="application/pdf"
-            className="cv"
-            multiple={false}
-            onUpload={this.uploadCV}
-            ref={n => this.fileRef = n}
-          />
-        </section>
+        <Header name={user && user.name} logout="/auth/students/logout"/>
+        <div className="student-page">
+          <section id="cv">
+            <h2>{ cv && !upload ? "Your CV" : "Upload CV"}</h2>
+            <FileUploadDialog
+              accept="application/pdf"
+              className="cv"
+              multiple={false}
+              onUpload={this.uploadCV}
+              ref={n => this.fileRef = n}
+            />
+          </section>
+        </div>
       </div>
     );
   }

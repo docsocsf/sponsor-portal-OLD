@@ -1,0 +1,27 @@
+.ReactTable {
+  border-radius: 4px;
+
+  .rt-head.-header {
+    box-shadow: none;
+    border-bottom: solid 1px rgba(0, 0, 0, 0.05);
+  }
+
+  .rt-td {
+    line-height: 38px;
+  }
+
+  .-pagination {
+    .-previous > .-btn {
+      margin-left: 0px;
+    }
+
+    .-center {
+      flex: 3;
+    }
+
+    .-next > .-btn {
+      margin-right: 6px;
+      margin-left: 0px;
+    }
+  }
+}
