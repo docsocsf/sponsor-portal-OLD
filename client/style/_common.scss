@@ -1,4 +1,5 @@
 @import 'colors';
+@import 'table-overrides';
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Avenir Next", "Avenir",
@@ -17,15 +18,38 @@ body {
     }
 }
 
+.container {
+  padding: 20px;
+  position: relative;
+}
+
 header {
-  max-width: 680px;
+  width: 100%;
   background-color: $background;
   color: white;
-  padding: 20px;
-  text-align: center;
-  margin: 0 auto 40px;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
+
+
+  .logos {
+    display: inline-block;
+
+    * {
+      vertical-align: middle;
+    }
+  }
+
+  .menu {
+    display: inline-block;
+    float: right;
+    height: 30px;
+
+    * {
+      vertical-align: middle;
+    }
+  }
+}
+
+.big-text {
+  font-size: 2rem;
 }
 
 h2 {

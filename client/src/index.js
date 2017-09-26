@@ -21,4 +21,4 @@ let root = (
   </Router>
 );
 
-ReactDOM.render(root, document.getElementById("main"));
+ReactDOM.render(root, document.getElementById("app"));

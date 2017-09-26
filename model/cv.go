@@ -8,9 +8,10 @@ import (
 )
 
 type CV struct {
-	Id   int64  `json:"id"`
-	Name string `json:"name"`
-	File string `json:"-"`
+	Id       int64  `json:"id"`
+	FileName string `json:"-"`
+	Name     string `json:"name"`
+	File     string `json:"-"`
 }
 
 type CVReader interface {
@@ -36,7 +37,7 @@ func NewCVWriter(db *sql.DB) CVWriter {
 
 const (
 	getCV     = `SELECT name, file FROM user_cv WHERE user_id = $1`
-	getAllCVs = `SELECT user_id, name, file FROM user_cv`
+	getAllCVs = `SELECT user_id, cv.name, file, users.name FROM user_cv AS cv JOIN users ON user_id = users.id`
 	insertCV  = `
 		INSERT INTO user_cv (user_id, name, file)
 		VALUES ($1, $2, $3)
@@ -74,14 +75,14 @@ func (c *cvImpl) GetAll() ([]CV, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var name, file string
+		var name, file, filename string
 		var id int64
-		err := rows.Scan(&id, &name, &file)
+		err := rows.Scan(&id, &filename, &file, &name)
 		if err != nil {
 			return cvs, DbError{Err: err}
 		}
 
-		cvs = append(cvs, CV{Id: id, Name: name, File: file})
+		cvs = append(cvs, CV{Id: id, FileName: filename, Name: name, File: file})
 	}
 	if err := rows.Err(); err != nil {
 		return cvs, DbError{Err: err}

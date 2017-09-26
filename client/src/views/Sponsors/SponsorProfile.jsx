@@ -2,6 +2,7 @@ import React from 'react';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import {fetchCVs, downloadCV} from './actions';
+import Header from 'Components/Header';
 
 class Download extends React.Component {
   download = async () => {
@@ -18,13 +19,14 @@ class Download extends React.Component {
 
 const columns = [
   {
-    Header: 'CV',
+    Header: 'Student\'s Name',
     accessor: 'name',
   },
   {
-    Header: 'Download',
+    Header: '',
     accessor: 'id',
-    Cell: row => <Download id={row.value} />
+    Cell: row => <Download id={row.value} />,
+    width: 120
   },
 ];
 
@@ -45,6 +47,7 @@ export default class SponsorProfile extends React.Component {
     try {
       const cvs = await fetchCVs()
       if (!cvs) return
+      console.log(cvs)
       this.setState({cvs})
     } catch (e) {
       console.log("fetch cvs", e)
@@ -55,13 +58,17 @@ export default class SponsorProfile extends React.Component {
     let {cvs} = this.state;
     return (
       <div>
-        <h1>Hello, Sponsor</h1>
-        <ReactTable
-          data={cvs}
-          columns={columns}
-          showPagination={false}
-          showPageSizeOptions={false}
-        />
+        <Header sponsor="CompSci Corp." name={"Ada"}/>
+        <div id="main">
+          <h1>Student CVs</h1>
+          <ReactTable
+            className="-striped"
+            data={cvs}
+            columns={columns}
+            showPagination={cvs.length > 10}
+            showPageSizeOptions={false}
+          />
+        </div>
       </div>
     );
   }
