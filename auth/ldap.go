@@ -8,7 +8,6 @@ import (
 )
 
 func ldapsConnection() *ldap.Conn {
-	// TODO: verify TLS
 	// TLS, for testing purposes disable certificate verification, check https://golang.org/pkg/crypto/tls/#Config for further information.
 	tlsConfig := &tls.Config{ServerName: "ldaps-vip.cc.ic.ac.uk"}
 	l, err := ldap.DialTLS("tcp", fmt.Sprintf("%s:%d", "ldaps-vip.cc.ic.ac.uk", 636), tlsConfig)

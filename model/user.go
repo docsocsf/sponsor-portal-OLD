@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/docsocsf/sponsor-portal/auth"
+	"github.com/docker/docker/integration-cli/checker"
 )
 
 type User struct {
