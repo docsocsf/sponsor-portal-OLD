@@ -15,7 +15,18 @@ type OAuth struct {
 	JwtIssuer string `env:"JWT_ISSUER,required"`
 }
 
-func GetAuth() (auth OAuth, err error) {
+type BasicAuth struct {
+	ServiceUsername string `env:"SERVICE_USER_NAME,required"`
+	ServicePassword string `env:"SERVICE_PASSWORD,required"`
+	Realm string `env:"REALM,required"`
+}
+
+func GetOAuth() (auth OAuth, err error) {
+	err = env.Parse(&auth)
+	return
+}
+
+func GetBasicAuth() (auth BasicAuth, err error) {
 	err = env.Parse(&auth)
 	return
 }

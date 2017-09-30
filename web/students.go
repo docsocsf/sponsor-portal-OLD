@@ -9,7 +9,7 @@ import (
 )
 
 func makeStudentService(staticFiles string) *student.Service {
-	authEnvConfig, err := config.GetAuth()
+	authEnvConfig, err := config.GetOAuth()
 	if err != nil {
 		log.Fatal(err, "Make student service")
 	}
