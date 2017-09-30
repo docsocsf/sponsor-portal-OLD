@@ -26,11 +26,11 @@ func main() {
 
 	r := mux.NewRouter().StrictSlash(true)
 
-	student := makeStudentService(host.StaticFiles)
-	sponsor := makeSponsorService(host.StaticFiles)
+	studentService := makeStudentService(host.StaticFiles)
+	sponsorService := makeSponsorService(host.StaticFiles)
 
-	handlers.NewApi(r.PathPrefix("/api/").Subrouter(), student, sponsor)
-	handlers.NewAuth(r.PathPrefix("/auth/").Subrouter(), student, sponsor)
+	handlers.NewApi(r.PathPrefix("/api/").Subrouter(), studentService, sponsorService)
+	handlers.NewAuth(r.PathPrefix("/auth/").Subrouter(), studentService, sponsorService)
 
 	assets := http.FileServer(http.Dir(host.StaticFiles))
 	r.PathPrefix("/assets").Handler(assets)
@@ -40,8 +40,8 @@ func main() {
 	})
 
 	r.Handle("/login", file(host.StaticFiles, "index.html"))
-	r.Handle("/students", file(host.StaticFiles, "students.html"))
-	r.Handle("/sponsors", file(host.StaticFiles, "sponsors.html"))
+	r.Handle("/students", auth.RequireAuth(file(host.StaticFiles, "students.html"), "/login", student.Role))
+	r.Handle("/sponsors", auth.RequireAuth(file(host.StaticFiles, "sponsors.html"), "/login", sponsor.Role))
 
 	log.Printf("Listening on %s...", host.Port)
 	log.Fatal(http.ListenAndServe(host.Port, handlers.LoggingHandler(os.Stdout, r)))
