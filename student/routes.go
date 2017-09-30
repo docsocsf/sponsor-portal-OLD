@@ -14,5 +14,5 @@ func (s *Service) GetApiRoutes() http.Handler {
 	api.HandleFunc("/cv", s.uploadCV).Methods(http.MethodPost)
 	api.HandleFunc("/cv", s.getCV).Methods(http.MethodGet)
 
-	return auth.RequireJWT(api, s.Auth, role)
+	return auth.RequireJWT(api, s.Auth, Role)
 }
