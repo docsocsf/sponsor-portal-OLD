@@ -3,4 +3,7 @@ node_modules
 
 client/dist/assets
 vendor
-/sponsor-portal
+./sponsor-portal
+
+.DS_STORE
+.idea
