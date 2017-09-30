@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/docsocsf/sponsor-portal/auth"
+	"github.com/docker/docker/integration-cli/checker"
 )
 
 type User struct {
@@ -20,6 +21,7 @@ type UserAuth struct {
 
 type UserReader interface {
 	Get(User) (User, error)
+	GetOrCreate(User) (User, error)
 	GetById(auth.UserIdentifier) (User, error)
 	HashedPassword(email string) (string, error)
 }
@@ -35,6 +37,10 @@ const (
 
 	getHashedPassword = `
 	SELECT hashed_password FROM users WHERE email=$1
+	`
+
+	insertUser = `
+	INSERT name, email INTO users VALUES ($1, $2) RETURNING id
 	`
 )
 
@@ -52,7 +58,7 @@ func (u userImpl) GetById(id auth.UserIdentifier) (User, error) {
 
 	switch {
 	case err == sql.ErrNoRows:
-		return User{}, errors.New("User does not exist")
+		return User{}, DbError{true, err}
 	case err != nil:
 		return User{}, err
 	default:
@@ -65,12 +71,26 @@ func (u userImpl) Get(user User) (User, error) {
 
 	switch {
 	case err == sql.ErrNoRows:
-		return User{}, errors.New("User does not exist")
+		return User{}, DbError{true, err}
 	case err != nil:
 		return User{}, err
 	default:
 		return user, nil
 	}
+}
+
+func (u userImpl) GetOrCreate(user User) (User, error) {
+	var err error
+	user, err = u.Get(user)
+	if err != nil {
+		if dbErr, ok := err.(DbError); ok && dbErr.NotFound {
+			// TODO: create user
+		} else {
+			return User{}, err
+		}
+	}
+
+	return user, nil
 }
 
 func (u userImpl) HashedPassword(email string) (string, error) {
@@ -81,7 +101,7 @@ func (u userImpl) HashedPassword(email string) (string, error) {
 
 	switch {
 	case err == sql.ErrNoRows:
-		return "", errors.New("User does not exist")
+		return "", DbError{true, err}
 	case err != nil:
 		return "", err
 	default:

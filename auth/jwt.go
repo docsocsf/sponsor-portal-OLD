@@ -28,7 +28,7 @@ var (
 const jtiKey = "jti"
 
 func init() {
-	authEnvConfig, err := config.GetAuth()
+	authEnvConfig, err := config.GetOAuth()
 	if err != nil {
 		log.Fatal(err, "Make jwt service")
 	}

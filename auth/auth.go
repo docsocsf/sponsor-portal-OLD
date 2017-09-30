@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 	"golang.org/x/crypto/bcrypt"
-	"golang.org/x/oauth2"
 	"github.com/egnwd/roles"
+
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	oauthService "google.golang.org/api/oauth2/v2"
@@ -16,7 +16,6 @@ import (
 type Auth interface {
 	//Handlers
 	Handler() http.Handler
-	handleCallback(w http.ResponseWriter, r *http.Request)
 	handleLogin(w http.ResponseWriter, r *http.Request)
 	handleLogout(w http.ResponseWriter, r *http.Request)
 
@@ -37,12 +36,14 @@ type auth struct {
 	postLogoutHandler http.Handler
 }
 
-type OAuth struct {
+type PasswordAuth = auth
+type BasicAuth struct {
 	auth
-	oauth *oauth2.Config
+	username string
+	password string
+	realm string
 }
 
-type PasswordAuth = auth
 
 var scopes = []string{oauthService.UserinfoEmailScope, oauthService.UserinfoProfileScope}
 
@@ -52,17 +53,16 @@ const (
 	callback = "/callback"
 )
 
-type UserInfoPlus = oauthService.Userinfoplus
-
 type UserInfo struct {
-	*UserInfoPlus
+	Name string
+	Email string
 	Password string
 }
 
 var cookieJar *sessions.CookieStore
 
 func init() {
-	cookieConfig, err := config.GetAuth()
+	cookieConfig, err := config.GetOAuth()
 	if err != nil {
 		log.Fatal(err.Error())
 	}

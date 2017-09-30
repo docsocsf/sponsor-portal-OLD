@@ -36,6 +36,7 @@ func main() {
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		httputils.Redirect(w, r, "/login")
 	})
+
 	r.Handle("/login", file(host.StaticFiles, "index.html"))
 
 	r.Handle("/students", file(host.StaticFiles, "students.html"))

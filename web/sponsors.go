@@ -9,7 +9,7 @@ import (
 )
 
 func makeSponsorService(staticFiles string) *sponsor.Service {
-	authEnvConfig, err := config.GetAuth()
+	authEnvConfig, err := config.GetOAuth()
 	if err != nil {
 		log.Fatal(err, "Make sponsor service")
 	}
