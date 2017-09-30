@@ -8,12 +8,10 @@ import (
 	"strings"
 
 	"github.com/docsocsf/sponsor-portal/config"
-	"github.com/egnwd/roles"
-	"github.com/gorilla/handlers"
+	"github.com/docsocsf/sponsor-portal/handlers"
+	"github.com/docsocsf/sponsor-portal/httputils"
 	"github.com/gorilla/mux"
 	_ "github.com/joho/godotenv/autoload"
-
-	"github.com/docsocsf/sponsor-portal/auth"
 )
 
 func main() {
@@ -23,22 +21,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	root := home(host.StaticFiles)
 	r := mux.NewRouter().StrictSlash(true)
 
 	student := makeStudentService(host.StaticFiles)
-	student.Handle(r, root)
-
 	sponsor := makeSponsorService(host.StaticFiles)
-	sponsor.Handle(r, root)
 
-	r.Handle("/jwt/token", auth.RequireAuth(auth.GetToken(false), "/", roles.Anyone))
-	r.Handle("/jwt/onetime-token", auth.RequireAuth(auth.GetToken(true), "/", roles.Anyone))
+	handlers.NewApi(r.PathPrefix("/api/").Subrouter(), student, sponsor)
+	handlers.NewAuth(r.PathPrefix("/auth/").Subrouter(), student, sponsor)
 
 	assets := http.FileServer(http.Dir(host.StaticFiles))
 	r.PathPrefix("/assets").Handler(assets)
-	r.Handle("/", root)
-	r.Handle("/login", auth.NoAuth(root, "/sponsors", "sponsor"))
+
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		httputils.Redirect(w, r, "/login")
+	})
+	r.Handle("/login", file(host.StaticFiles, "index.html"))
+	r.Handle("/students", file(host.StaticFiles, "students.html"))
+	r.Handle("/sponsors", file(host.StaticFiles, "sponsors.html"))
 
 	log.Printf("Listening on %s...", host.Port)
 	log.Fatal(http.ListenAndServe(host.Port, handlers.LoggingHandler(os.Stdout, r)))
@@ -48,8 +47,8 @@ func rootMatcher(r *http.Request, rm *mux.RouteMatch) bool {
 	return r.URL.IsAbs() && !strings.HasPrefix(r.URL.Path, "/assets")
 }
 
-func home(static string) http.Handler {
+func file(static, filename string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, path.Join(static, "index.html"))
+		http.ServeFile(w, r, path.Join(static, filename))
 	})
 }

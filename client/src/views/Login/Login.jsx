@@ -2,7 +2,6 @@ import React from 'react';
 import Header from 'Components/Header';
 import md5 from 'md5';
 import request from 'superagent';
-import {Redirect} from 'react-router';
 
 export default class Login extends React.Component {
   constructor(props) {
@@ -11,7 +10,6 @@ export default class Login extends React.Component {
     this.state = {
       email: '',
       password: '',
-      redirect: undefined
     };
   }
 
@@ -21,12 +19,12 @@ export default class Login extends React.Component {
     password = md5(password)
     try {
       let resp = await request
-        .post('/sponsors/auth/login')
+        .post('/auth/sponsors/login')
         .type('form')
         .send({ email })
         .send({ password })
       let redirect = new URL(resp.xhr.responseURL).pathname;
-      this.setState({redirect});
+      window.location.replace(redirect)
     } catch (e) {
       console.log(e);
       this.setState({error: "The email and/or password you entered was incorrect"});
@@ -36,10 +34,7 @@ export default class Login extends React.Component {
   handleChange = (event) => this.setState({ [event.target.name]: event.target.value })
 
   render() {
-    let {redirect, error, email, password } = this.state;
-    if (!!redirect) {
-      return (<Redirect to={redirect} />);
-    }
+    let {error, email, password } = this.state;
 
     return (
       <div>

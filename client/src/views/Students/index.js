@@ -6,13 +6,13 @@ import StudentProfile from './StudentProfile';
 
 const fetchUser = async () => {
   const headers = await getJWTHeader();
-  let resp = await fetchWithConfig('/students/api/user', { headers })
+  let resp = await fetchWithConfig('/api/students/user', { headers })
   return resp.body
 }
 
 const fetchCV = async () => {
   const headers = await getJWTHeader();
-  let resp = await fetchWithConfig('/students/api/cv', { headers })
+  let resp = await fetchWithConfig('/api/students/cv', { headers })
   return resp.body
 }
 
