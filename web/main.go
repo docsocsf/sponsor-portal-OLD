@@ -7,12 +7,10 @@ import (
 	"path"
 	"strings"
 
-	"github.com/docsocsf/sponsor-portal/auth"
 	"github.com/docsocsf/sponsor-portal/config"
 	"github.com/docsocsf/sponsor-portal/handlers"
 	"github.com/docsocsf/sponsor-portal/httputils"
-	"github.com/docsocsf/sponsor-portal/sponsor"
-	"github.com/docsocsf/sponsor-portal/student"
+
 	"github.com/gorilla/mux"
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -26,11 +24,11 @@ func main() {
 
 	r := mux.NewRouter().StrictSlash(true)
 
-	studentService := makeStudentService(host.StaticFiles)
-	sponsorService := makeSponsorService(host.StaticFiles)
+	student := makeStudentService(host.StaticFiles)
+	sponsor := makeSponsorService(host.StaticFiles)
 
-	r.PathPrefix("/api/").Handler(http.StripPrefix("/api", handlers.Api(studentService, sponsorService)))
-	r.PathPrefix("/auth/").Handler(http.StripPrefix("/auth", handlers.Auth(studentService, sponsorService)))
+	handlers.NewApi(r.PathPrefix("/api/").Subrouter(), student, sponsor)
+	handlers.NewAuth(r.PathPrefix("/auth/").Subrouter(), student, sponsor)
 
 	assets := http.FileServer(http.Dir(host.StaticFiles))
 	r.PathPrefix("/assets").Handler(assets)
@@ -40,8 +38,9 @@ func main() {
 	})
 
 	r.Handle("/login", file(host.StaticFiles, "index.html"))
-	r.Handle("/students", auth.RequireAuth(file(host.StaticFiles, "students.html"), "/login", student.Role))
-	r.Handle("/sponsors", auth.RequireAuth(file(host.StaticFiles, "sponsors.html"), "/login", sponsor.Role))
+
+	r.Handle("/students", file(host.StaticFiles, "students.html"))
+	r.Handle("/sponsors", file(host.StaticFiles, "sponsors.html"))
 
 	log.Printf("Listening on %s...", host.Port)
 	log.Fatal(http.ListenAndServe(host.Port, handlers.LoggingHandler(os.Stdout, r)))

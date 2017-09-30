@@ -6,5 +6,7 @@ vendor
 
 .DS_STORE
 .idea
-./sponsor-portal
+/sponsor-portal
 
+.idea
+.DS_STORE

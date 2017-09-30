@@ -8,9 +8,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func Api(students *student.Service, sponsors *sponsor.Service) http.Handler {
-	r := mux.NewRouter()
-	r.PathPrefix("/students/").Handler(http.StripPrefix("/students", students.GetApiRoutes()))
-	r.PathPrefix("/sponsors/").Handler(http.StripPrefix("/sponsors", sponsors.GetApiRoutes()))
-	return r
+type Api struct {
+	router *mux.Router
+}
+
+func NewApi(r *mux.Router, students *student.Service, sponsors *sponsor.Service) *Api {
+	r.PathPrefix("/students/").Handler(http.StripPrefix("/api/students", students.GetApiRoutes()))
+	r.PathPrefix("/sponsors/").Handler(http.StripPrefix("/api/sponsors", sponsors.GetApiRoutes()))
+	return &Api{r}
 }
