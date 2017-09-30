@@ -6,12 +6,12 @@ export const fetchCVs = async () => {
     Accept: 'application/json',
     'Content-Type': 'application/json',
   });
-  let resp = await fetchWithConfig('/sponsors/api/cvs', { headers })
+  let resp = await fetchWithConfig('/api/sponsors/cvs', { headers })
   return resp.body;
 }
 
 export const downloadCV = async id => {
-    const endpoint = `/sponsors/api/cv/${id}/download?token=`;
+  const endpoint = `/api/sponsors/cv/${id}/download?token=`;
     const token = await getToken(onetimeToken);
     window.location.href = `${endpoint}${token}`;
 }

@@ -7,15 +7,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (s *Service) defineRoutes(r *mux.Router, web http.Handler) {
-	// auth
-	r.PathPrefix("/auth").Handler(http.StripPrefix("/sponsors/auth", s.Auth.Handler()))
-
-	r.Handle("/", auth.RequireAuth(web, "/login", role))
-	r.PathPrefix("/api").Handler(http.StripPrefix("/sponsors/api", s.getApiRoutes()))
-}
-
-func (s *Service) getApiRoutes() http.Handler {
+func (s *Service) GetApiRoutes() http.Handler {
 	api := mux.NewRouter()
 	get := api.Methods(http.MethodGet).Subrouter()
 
