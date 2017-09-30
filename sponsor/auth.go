@@ -10,10 +10,10 @@ import (
 	"github.com/egnwd/roles"
 )
 
-const role = "sponsor"
+const Role = "sponsor"
 
 func init() {
-	roles.Register(role, auth.RoleChecker(role))
+	roles.Register(Role, auth.RoleChecker(Role))
 }
 
 func (s *Service) setupAuth(config *auth.Config) (err error) {
@@ -57,7 +57,7 @@ func (s *Service) authHandler(info auth.UserInfo) (*auth.UserIdentifier, error) 
 		return nil, err
 	}
 
-	id := auth.UserIdentifier{user.Id, role}
+	id := auth.UserIdentifier{user.Id, Role}
 
 	return &id, nil
 }

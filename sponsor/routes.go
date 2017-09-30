@@ -12,11 +12,11 @@ func (s *Service) GetApiRoutes() http.Handler {
 	get := api.Methods(http.MethodGet).Subrouter()
 
 	get.Handle("/cvs",
-		auth.RequireJWT(http.HandlerFunc(s.getCVs), s.Auth, role),
+		auth.RequireJWT(http.HandlerFunc(s.getCVs), s.Auth, Role),
 	)
 
 	get.Handle("/cv/{id:[0-9]+}/download",
-		auth.RequireOnetimeJWT(http.HandlerFunc(s.downloadCV), s.Auth, role),
+		auth.RequireOnetimeJWT(http.HandlerFunc(s.downloadCV), s.Auth, Role),
 	)
 
 	return api
