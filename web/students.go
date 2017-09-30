@@ -15,7 +15,7 @@ func makeStudentService(staticFiles string) *student.Service {
 	}
 
 	authConfig := &auth.Config{
-		BaseURL:      authEnvConfig.BaseURL + "/students/auth",
+		BaseURL:      authEnvConfig.BaseURL + "/students",
 		Issuer:       authEnvConfig.Issuer,
 		ClientID:     authEnvConfig.ClientID,
 		ClientSecret: authEnvConfig.ClientSecret,

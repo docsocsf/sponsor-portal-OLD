@@ -3,9 +3,9 @@ package sponsor
 import (
 	"errors"
 	"net/http"
-	"net/url"
 
 	"github.com/docsocsf/sponsor-portal/auth"
+	"github.com/docsocsf/sponsor-portal/httputils"
 	"github.com/docsocsf/sponsor-portal/model"
 	"github.com/egnwd/roles"
 )
@@ -63,7 +63,7 @@ func (s *Service) authHandler(info auth.UserInfo) (*auth.UserIdentifier, error) 
 }
 
 func (s *Service) authSuccessHandler(w http.ResponseWriter, r *http.Request) {
-	redirect(w, r, "/sponsors/")
+	httputils.Redirect(w, r, "/sponsors/")
 }
 
 func (s *Service) authFailureHandler(w http.ResponseWriter, r *http.Request) {
@@ -71,23 +71,5 @@ func (s *Service) authFailureHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) authPostLogoutHandler(w http.ResponseWriter, r *http.Request) {
-	redirect(w, r, "/")
-}
-
-// TODO: dedupe
-func redirect(w http.ResponseWriter, r *http.Request, to string) {
-	newUri, err := url.Parse(to)
-	if err != nil {
-		http.Error(w, "Failed to parse redirect path", http.StatusInternalServerError)
-		return
-	}
-
-	baseUri, err := url.Parse(r.RequestURI)
-	if err != nil {
-		http.Error(w, "Failed to parse redirect base", http.StatusInternalServerError)
-		return
-	}
-
-	path := baseUri.ResolveReference(newUri).String()
-	http.Redirect(w, r, path, http.StatusSeeOther)
+	httputils.Redirect(w, r, "/")
 }

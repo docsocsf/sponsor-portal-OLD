@@ -47,7 +47,7 @@ export default class StudentProfile extends React.Component {
 
     try {
       let data = await request
-        .post('/students/api/cv')
+        .post('/api/students/cv')
         .set(headers)
         .attach('cv', files[0]).
         on('progress', event => {
