@@ -3,17 +3,14 @@ package auth
 import (
 	"log"
 	"net/http"
-
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
-
 	"github.com/egnwd/roles"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	oauthService "google.golang.org/api/oauth2/v2"
-	_ "github.com/joho/godotenv/autoload"
-
 	"github.com/docsocsf/sponsor-portal/config"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 type Auth interface {
@@ -67,7 +64,7 @@ var cookieJar *sessions.CookieStore
 func init() {
 	cookieConfig, err := config.GetAuth()
 	if err != nil {
-		log.Fatal("Could not load config: ", err.Error())
+		log.Fatal(err.Error())
 	}
 	cookieJar = sessions.NewCookieStore([]byte(cookieConfig.CookieSecret))
 }
