@@ -60,6 +60,23 @@ func contains(slice []string, item string) bool {
 	return ok
 }
 
+func isDoCSoc(l *ldap.Conn, accountName string) bool {
+	entries := search(l, accountName)
+
+	return contains(entries[0].GetAttributeValues("memberOf"), "CN=zz-icu-docsoc-members-dl,OU=Distribution,OU=Groups,OU=Imperial College (London),DC=ic,DC=ac,DC=uk")
+}
+
+// From: https://stackoverflow.com/a/27272103
+func contains(slice []string, item string) bool {
+	set := make(map[string]struct{}, len(slice))
+	for _, s := range slice {
+		set[s] = struct{}{}
+	}
+
+	_, ok := set[item]
+	return ok
+}
+
 // Example User Authentication shows how a typical application can verify a login attempt
 func userAuth(l *ldap.Conn, serviceUsername string, servicePassword string, username string, password string) bool {
 	// First bind with our service user
