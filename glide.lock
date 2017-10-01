@@ -1,10 +1,6 @@
-hash: 1d52009664bff8c9ee28ca8a9f96dd0401600662bbd6e8c5e590fe66d1c8b49a
-updated: 2017-09-21T00:22:50.662717045+01:00
+hash: e334442146feb36cb6069746d9ad8b2aaf776ca2fa336a266ece33edc382c7c0
+updated: 2017-10-01T18:06:45.882380181+01:00
 imports:
-- name: cloud.google.com/go
-  version: d2bf9ead8d595b9347434a2bcbaec6395862adab
-  subpackages:
-  - compute/metadata
 - name: github.com/aws/aws-sdk-go
   version: 61b379ef486ea3baa55e10c358f3217f06e7b5ad
   subpackages:
@@ -41,10 +37,6 @@ imports:
   version: 46e4e74dbd799f2017a876337d7121bf24c27f57
 - name: github.com/go-ini/ini
   version: 74bdc99692c3408cb103221e38675ce8fda0a718
-- name: github.com/golang/protobuf
-  version: 5a0f697c9ed9d68fef0116532c6e05cfeae00e55
-  subpackages:
-  - proto
 - name: github.com/gorilla/context
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/handlers
@@ -75,13 +67,6 @@ imports:
   subpackages:
   - context
   - context/ctxhttp
-- name: golang.org/x/oauth2
-  version: f047394b6d14284165300fd82dad67edb3a4d7f6
-  subpackages:
-  - google
-  - internal
-  - jws
-  - jwt
 - name: google.golang.org/api
   version: e665075b5ff79143ba49c58fab02df9dc122afd5
   subpackages:
@@ -89,16 +74,8 @@ imports:
   - googleapi
   - googleapi/internal/uritemplates
   - oauth2/v2
-- name: google.golang.org/appengine
-  version: a2f4131514e563cedfdb6e7d267df9ad48591e93
-  subpackages:
-  - internal
-  - internal/app_identity
-  - internal/base
-  - internal/datastore
-  - internal/log
-  - internal/modules
-  - internal/remote_api
-  - internal/urlfetch
-  - urlfetch
+- name: gopkg.in/asn1-ber.v1
+  version: 379148ca0225df7a432012b8df0355c2a2063ac0
+- name: gopkg.in/ldap.v2
+  version: 8168ee085ee43257585e50c6441aadf54ecb2c9f
 testImports: []
