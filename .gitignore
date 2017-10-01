@@ -3,4 +3,4 @@ node_modules
 
 client/dist/assets
 vendor
-./sponsor-portal
+/sponsor-portal
