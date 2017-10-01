@@ -1,11 +1,15 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"path"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/docsocsf/sponsor-portal/auth"
 	"github.com/docsocsf/sponsor-portal/config"
@@ -42,8 +46,24 @@ func main() {
 	r.Handle("/students", auth.RequireAuth(file(host.StaticFiles, "students.html"), "/login", student.Role))
 	r.Handle("/sponsors", auth.RequireAuth(file(host.StaticFiles, "sponsors.html"), "/login", sponsor.Role))
 
-	log.Printf("Listening on %s...", host.Port)
-	log.Fatal(http.ListenAndServe(host.Port, handlers.LoggingHandler(os.Stdout, r)))
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
+
+	s := http.Server{Addr: host.Port, Handler: handlers.LoggingHandler(os.Stdout, r)}
+
+	go func() {
+		log.Printf("Listening on %s...", host.Port)
+		if err = s.ListenAndServe(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	<-stop
+	log.Println("Shutting down the server...")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	s.Shutdown(ctx)
+	log.Println("Goodbye")
 }
 
 func rootMatcher(r *http.Request, rm *mux.RouteMatch) bool {
