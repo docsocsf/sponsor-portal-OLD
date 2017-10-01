@@ -80,19 +80,14 @@ func (u userImpl) Get(user User) (User, error) {
 func (u userImpl) GetOrCreate(user User) (User, error) {
 	var err error
 	user, err = u.Get(user)
-	log.Println("getOrCreate 1: ", err, user)
 	if err != nil {
 		if dbErr, ok := err.(DbError); ok && dbErr.NotFound {
-			// TODO: create user
-			var id int64
 			log.Printf("%#v\n", u)
-			err := u.db.QueryRow(insertUser, user.Name, user.Auth.Email).Scan(id)
-			log.Println("getOrCreate 2: ", err)
+			err := u.db.QueryRow(insertUser, user.Name, user.Auth.Email).Scan(user.Id)
 			if err != nil {
 				return User{}, err
 			}
 		} else {
-			log.Println("getOrCreate 3: ", err)
 			return User{}, err
 		}
 	}
