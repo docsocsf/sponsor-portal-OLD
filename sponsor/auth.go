@@ -67,7 +67,7 @@ func (s *Service) authSuccessHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) authFailureHandler(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Authentication failure", http.StatusForbidden)
+	http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 }
 
 func (s *Service) authPostLogoutHandler(w http.ResponseWriter, r *http.Request) {

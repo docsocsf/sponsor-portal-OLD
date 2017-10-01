@@ -2,11 +2,108 @@
 @import 'colors';
 @import 'buttons';
 
+#login-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
 #login {
   text-align: center;
+  box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.5);
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  width: 380px;
+  margin: 0 auto;
+  background: $background;
+  overflow: hidden;
+
+  img.logo {
+    margin: 40px auto 5px;
+  }
+
+  h1 {
+    color: white;
+    margin: 5px 0 40px;
+  }
 
   .student {
     background: lighten($background, 10);
+  }
+
+  .react-tabs {
+    margin-top: auto;
+
+    ul.react-tabs__tab-list {
+      margin: 0;
+      padding: 0;
+
+      -webkit-transform: translateY(5px);
+      transform: translateY(5px);
+
+      >li {
+        transition-duration: .25s;
+        display: inline-block;
+        list-style: none;
+        text-align: center;
+        padding: 15px 15px 20px 15px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        color: white;
+
+        &:before{
+          z-index: -1;
+          position: absolute;
+          content: "";
+          width: 100%;
+          height: 120%;
+          top: 0;
+          left: 0;
+          background-color: rgba(255, 255, 255, .3);
+          -webkit-transform: translateY(100%);
+          transform: translateY(100%);
+          transition-duration: .25s;
+          border-radius: 5px 5px 0 0;
+        }
+
+        &:hover{
+          &:before{
+            -webkit-transform: translateY(70%);
+            transform: translateY(70%);
+          }
+        }
+
+        &.react-tabs__tab--selected{
+          color: rgb(80, 85, 90);
+
+          &:before{
+            transition-duration: .5s;
+            background-color: white;
+            -webkit-transform: translateY(0);
+            transform: translateY(0);
+          }
+        }
+      }
+    }
+
+    .react-tabs__tab-panel {
+      background: #fff;
+      padding: 10px;
+      display: none;
+      min-height: 120px;
+
+      &.react-tabs__tab-panel--selected {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
   }
 }
 
