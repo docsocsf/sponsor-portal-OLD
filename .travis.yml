@@ -1,0 +1,15 @@
+language: go
+
+before_install:
+    - mkdir $HOME/.bin
+    - curl -sSfL "https://github.com/Masterminds/glide/releases/download/v0.13.0/glide-v0.13.0-linux-amd64.tar.gz"
+        | tar -zxC $HOME/.bin --strip-components 1 linux-amd64/glide
+    - export PATH="$HOME/.bin:$PATH"
+
+install:
+    - make install
+
+script:
+    - make client-dev
+    - make client
+    - make server

@@ -6,6 +6,7 @@ DB_CONN := postgres://${DB_USER}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_S
 .PHONY: start seed server client
 
 install:
+	cd client; yarn
 	glide install
 
 setupdb:
