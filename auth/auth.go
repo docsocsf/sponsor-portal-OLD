@@ -66,7 +66,7 @@ var cookieJar *sessions.CookieStore
 func init() {
 	cookieConfig, err := config.GetOAuth()
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatal("Could not load config: ", err.Error())
 	}
 	cookieJar = sessions.NewCookieStore([]byte(cookieConfig.CookieSecret))
 }
