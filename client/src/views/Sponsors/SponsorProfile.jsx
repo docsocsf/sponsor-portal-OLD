@@ -58,7 +58,7 @@ export default class SponsorProfile extends React.Component {
     let {cvs} = this.state;
     return (
       <div>
-        <Header sponsor="CompSci Corp." name={"Ada"}/>
+        <Header/>
         <div id="main">
           <h1>Student CVs</h1>
           <ReactTable

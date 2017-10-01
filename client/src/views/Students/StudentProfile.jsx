@@ -69,15 +69,17 @@ export default class StudentProfile extends React.Component {
       <div>
         <Header name={user && user.name} logout="/auth/students/logout"/>
         <div className="student-page">
-          <section id="cv">
-            <h2>{ cv && !upload ? "Your CV" : "Upload CV"}</h2>
-            <FileUploadDialog
-              accept="application/pdf"
-              className="cv"
-              multiple={false}
-              onUpload={this.uploadCV}
-              ref={n => this.fileRef = n}
-            />
+          <section id="profile">
+            <div id="cv">
+              <h2>{ cv && !upload ? "Your CV" : "Upload CV"}</h2>
+              <FileUploadDialog
+                accept="application/pdf"
+                className="cv"
+                multiple={false}
+                onUpload={this.uploadCV}
+                ref={n => this.fileRef = n}
+              />
+            </div>
           </section>
         </div>
       </div>
