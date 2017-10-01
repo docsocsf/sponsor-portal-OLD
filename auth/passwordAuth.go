@@ -38,10 +38,9 @@ func (auth *PasswordAuth) handleLogin(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 	ui := UserInfo{
-		&UserInfoPlus{
-			Email: email,
-		},
-		password,
+		Name: "Not Joe Bloggs",
+		Email: email,
+		Password: password,
 	}
 
 	id, err := auth.get(ui)
