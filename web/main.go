@@ -13,6 +13,7 @@ import (
 
 	"github.com/gorilla/mux"
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/docsocsf/sponsor-portal/auth"
 )
 
 func main() {
@@ -38,9 +39,8 @@ func main() {
 	})
 
 	r.Handle("/login", file(host.StaticFiles, "index.html"))
-
-	r.Handle("/students", file(host.StaticFiles, "students.html"))
-	r.Handle("/sponsors", file(host.StaticFiles, "sponsors.html"))
+	r.Handle("/students", auth.RequireAuth(file(host.StaticFiles, "students.html"), "/auth/students/login", student.Role))
+	r.Handle("/sponsors", auth.RequireAuth(file(host.StaticFiles, "sponsors.html"), "/login", sponsor.Role))
 
 	log.Printf("Listening on %s...", host.Port)
 	log.Fatal(http.ListenAndServe(host.Port, handlers.LoggingHandler(os.Stdout, r)))

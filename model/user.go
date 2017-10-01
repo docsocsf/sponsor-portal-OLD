@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/docsocsf/sponsor-portal/auth"
-	"github.com/docker/docker/integration-cli/checker"
 )
 
 type User struct {
@@ -81,6 +80,7 @@ func (u userImpl) Get(user User) (User, error) {
 func (u userImpl) GetOrCreate(user User) (User, error) {
 	var err error
 	user, err = u.Get(user)
+	log.Println("getOrCreate 1: ", err, user)
 	if err != nil {
 		if dbErr, ok := err.(DbError); ok && dbErr.NotFound {
 			log.Printf("%#v\n", u)
@@ -89,6 +89,7 @@ func (u userImpl) GetOrCreate(user User) (User, error) {
 				return User{}, err
 			}
 		} else {
+			log.Println("getOrCreate 3: ", err)
 			return User{}, err
 		}
 	}

@@ -43,7 +43,6 @@ func searchForName(l *ldap.Conn, accountName string) string {
 
 	return firstName +" "+ surname
 }
-
 func isDoCSoc(l *ldap.Conn, accountName string) bool {
 	entries := search(l, accountName)
 
