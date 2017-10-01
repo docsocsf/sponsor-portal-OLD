@@ -1,11 +1,15 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"path"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/docsocsf/sponsor-portal/auth"
 	"github.com/docsocsf/sponsor-portal/config"
@@ -14,10 +18,9 @@ import (
 
 	"github.com/gorilla/mux"
 	_ "github.com/joho/godotenv/autoload"
-<<<<<<< HEAD
-	"github.com/docsocsf/sponsor-portal/auth"
-=======
->>>>>>> 2ef659d8ef844227197daed19ea0d5e01d122aba
+	"github.com/docsocsf/sponsor-portal/sponsor"
+	"github.com/docsocsf/sponsor-portal/student"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
@@ -29,11 +32,11 @@ func main() {
 
 	r := mux.NewRouter().StrictSlash(true)
 
-	student := makeStudentService(host.StaticFiles)
-	sponsor := makeSponsorService(host.StaticFiles)
+	studentService := makeStudentService(host.StaticFiles)
+	sponsorService := makeSponsorService(host.StaticFiles)
 
-	handlers.NewApi(r.PathPrefix("/api/").Subrouter(), student, sponsor)
-	handlers.NewAuth(r.PathPrefix("/auth/").Subrouter(), student, sponsor)
+	r.PathPrefix("/api/").Handler(http.StripPrefix("/api", handlers.Api(studentService, sponsorService)))
+	r.PathPrefix("/auth/").Handler(http.StripPrefix("/auth", handlers.Auth(studentService, sponsorService)))
 
 	assets := http.FileServer(http.Dir(host.StaticFiles))
 	r.PathPrefix("/assets").Handler(assets)
@@ -41,13 +44,28 @@ func main() {
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		httputils.Redirect(w, r, "/login")
 	})
-
 	r.Handle("/login", file(host.StaticFiles, "index.html"))
-	r.Handle("/students", auth.RequireAuth(file(host.StaticFiles, "students.html"), "/auth/students/login", student.Role))
+	r.Handle("/students", auth.RequireAuth(file(host.StaticFiles, "students.html"), "/login", student.Role))
 	r.Handle("/sponsors", auth.RequireAuth(file(host.StaticFiles, "sponsors.html"), "/login", sponsor.Role))
 
-	log.Printf("Listening on %s...", host.Port)
-	log.Fatal(http.ListenAndServe(host.Port, handlers.LoggingHandler(os.Stdout, r)))
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
+
+	s := http.Server{Addr: host.Port, Handler: handlers.LoggingHandler(os.Stdout, r)}
+
+	go func() {
+		log.Printf("Listening on %s...", host.Port)
+		if err = s.ListenAndServe(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	<-stop
+	log.Println("Shutting down the server...")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	s.Shutdown(ctx)
+	log.Println("Goodbye")
 }
 
 func rootMatcher(r *http.Request, rm *mux.RouteMatch) bool {
