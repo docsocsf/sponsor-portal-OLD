@@ -40,3 +40,6 @@ Gruntfile.js
 # misc
 *.gz
 *.md
+
+# See yarnpkg/yarn#1051
+!.svgo.yml
