@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	oauthService "google.golang.org/api/oauth2/v2"
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/docsocsf/sponsor-portal/config"
 	_ "github.com/joho/godotenv/autoload"
 )

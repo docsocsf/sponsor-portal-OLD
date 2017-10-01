@@ -7,13 +7,13 @@ import (
 	"path"
 	"strings"
 
+	"github.com/docsocsf/sponsor-portal/auth"
 	"github.com/docsocsf/sponsor-portal/config"
 	"github.com/docsocsf/sponsor-portal/handlers"
 	"github.com/docsocsf/sponsor-portal/httputils"
 
 	"github.com/gorilla/mux"
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/docsocsf/sponsor-portal/auth"
 )
 
 func main() {
@@ -30,6 +30,7 @@ func main() {
 
 	handlers.NewApi(r.PathPrefix("/api/").Subrouter(), student, sponsor)
 	handlers.NewAuth(r.PathPrefix("/auth/").Subrouter(), student, sponsor)
+
 
 	assets := http.FileServer(http.Dir(host.StaticFiles))
 	r.PathPrefix("/assets").Handler(assets)
