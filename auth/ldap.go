@@ -24,7 +24,7 @@ func search(l *ldap.Conn, accountName string) []*ldap.Entry {
 		"dc=ic,dc=ac,dc=uk", // The base dn to search
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		"(sAMAccountName=" + accountName + ")", // The filter to apply
-		[]string{"dn", "cn"},                    // A list attributes to retrieve
+		[]string{"dn", "cn", "givenName", "sn"},                    // A list attributes to retrieve
 		nil,
 	)
 
@@ -36,6 +36,15 @@ func search(l *ldap.Conn, accountName string) []*ldap.Entry {
 	return sr.Entries
 }
 
+func searchForName(l *ldap.Conn, accountName string) string {
+	entries := search(l, accountName)
+
+	firstName := entries[0].GetAttributeValue("givenName")
+	surname := entries[0].GetAttributeValue("sn")
+
+	return firstName +" "+ surname
+}
+
 // Example User Authentication shows how a typical application can verify a login attempt
 func userAuth(l *ldap.Conn, serviceUsername string, servicePassword string, username string, password string) bool {
 	// First bind with our service user
@@ -45,6 +54,8 @@ func userAuth(l *ldap.Conn, serviceUsername string, servicePassword string, user
 	}
 
 	searchResult := search(l, username)
+	meh := searchForName(l, "jep114")
+	log.Println(meh)
 
 	if len(searchResult) != 1 {
 		fmt.Println("User does not exist or too many entries returned")
