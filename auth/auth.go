@@ -7,10 +7,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 
+	"github.com/egnwd/roles"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	oauthService "google.golang.org/api/oauth2/v2"
-	"github.com/egnwd/roles"
 
 	"github.com/docsocsf/sponsor-portal/config"
 )
@@ -37,7 +37,6 @@ type auth struct {
 	successHandler    http.Handler
 	failureHandler    http.Handler
 	postLogoutHandler http.Handler
-
 }
 
 type OAuth struct {
