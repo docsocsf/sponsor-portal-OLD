@@ -44,7 +44,7 @@ func (s *Service) authHandler(info auth.UserInfo) (*auth.UserIdentifier, error) 
 		},
 	}
 
-	user, err := s.UserReader.Get(userModel)
+	user, err := s.UserReader.GetOrCreate(userModel)
 	if err != nil {
 		return nil, err
 	}

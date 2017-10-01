@@ -2,11 +2,9 @@ package model
 
 import (
 	"database/sql"
-	"errors"
 	"log"
 
 	"github.com/docsocsf/sponsor-portal/auth"
-	"github.com/docker/docker/integration-cli/checker"
 )
 
 type User struct {
@@ -40,7 +38,7 @@ const (
 	`
 
 	insertUser = `
-	INSERT name, email INTO users VALUES ($1, $2) RETURNING id
+	INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id
 	`
 )
 
@@ -71,7 +69,7 @@ func (u userImpl) Get(user User) (User, error) {
 
 	switch {
 	case err == sql.ErrNoRows:
-		return User{}, DbError{true, err}
+		return user, DbError{true, err}
 	case err != nil:
 		return User{}, err
 	default:
@@ -82,10 +80,19 @@ func (u userImpl) Get(user User) (User, error) {
 func (u userImpl) GetOrCreate(user User) (User, error) {
 	var err error
 	user, err = u.Get(user)
+	log.Println("getOrCreate 1: ", err, user)
 	if err != nil {
 		if dbErr, ok := err.(DbError); ok && dbErr.NotFound {
 			// TODO: create user
+			var id int64
+			log.Printf("%#v\n", u)
+			err := u.db.QueryRow(insertUser, user.Name, user.Auth.Email).Scan(id)
+			log.Println("getOrCreate 2: ", err)
+			if err != nil {
+				return User{}, err
+			}
 		} else {
+			log.Println("getOrCreate 3: ", err)
 			return User{}, err
 		}
 	}

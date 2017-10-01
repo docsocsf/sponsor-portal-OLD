@@ -5,7 +5,6 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/gorilla/mux"
 	"github.com/docsocsf/sponsor-portal/config"
-	"github.com/docker/docker/api/server/router"
 	"log"
 )
 
@@ -23,7 +22,7 @@ func NewBasicAuth(conf *Config) (*BasicAuth, error) {
 
 	router := mux.NewRouter()
 
-	router.HandleFunc(login, auth.handleLogin).Methods(http.MethodPost)
+	router.HandleFunc(login, auth.handleLogin).Methods(http.MethodGet)
 	router.HandleFunc(logout, auth.handleLogout)
 
 	auth.router = router
@@ -59,7 +58,7 @@ func (auth *BasicAuth) handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ui := UserInfo{
-		Name: "Joe Bloggs", // TODO: get this from LDAP
+		Name: searchForName(l, user),
 		Email: user + "ic.ac.uk",
 	}
 
