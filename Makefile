@@ -36,6 +36,9 @@ server:
 run: server
 	./sponsor-portal
 
+test:
+	go test ./... -v
+
 .PHONY: install setupdb seed setup
 .PHONY: client client-dev watch
-.PHONY: server run
+.PHONY: server run test

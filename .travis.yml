@@ -9,7 +9,10 @@ before_install:
 install:
     - make install
 
-script:
+before_script:
     - make client-dev
     - make client
     - make server
+
+script:
+    - make test
