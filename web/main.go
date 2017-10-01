@@ -29,8 +29,8 @@ func main() {
 	studentService := makeStudentService(host.StaticFiles)
 	sponsorService := makeSponsorService(host.StaticFiles)
 
-	handlers.NewApi(r.PathPrefix("/api/").Subrouter(), studentService, sponsorService)
-	handlers.NewAuth(r.PathPrefix("/auth/").Subrouter(), studentService, sponsorService)
+	r.PathPrefix("/api/").Handler(http.StripPrefix("/api", handlers.Api(studentService, sponsorService)))
+	r.PathPrefix("/auth/").Handler(http.StripPrefix("/auth", handlers.Auth(studentService, sponsorService)))
 
 	assets := http.FileServer(http.Dir(host.StaticFiles))
 	r.PathPrefix("/assets").Handler(assets)

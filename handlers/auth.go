@@ -10,15 +10,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type Auth struct {
-	router *mux.Router
-}
-
-func NewAuth(r *mux.Router, students *student.Service, sponsors *sponsor.Service) *Auth {
+func Auth(students *student.Service, sponsors *sponsor.Service) http.Handler {
+	r := mux.NewRouter()
 	r.HandleFunc("/jwt", getJwt)
-	r.PathPrefix("/students/").Handler(http.StripPrefix("/auth/students", students.Auth.Handler()))
-	r.PathPrefix("/sponsors/").Handler(http.StripPrefix("/auth/sponsors", sponsors.Auth.Handler()))
-	return &Auth{r}
+	r.PathPrefix("/students/").Handler(http.StripPrefix("/students", students.Auth.Handler()))
+	r.PathPrefix("/sponsors/").Handler(http.StripPrefix("/sponsors", sponsors.Auth.Handler()))
+	return r
 }
 
 func getJwt(w http.ResponseWriter, r *http.Request) {
