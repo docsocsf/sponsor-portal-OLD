@@ -10,7 +10,7 @@ import (
 func ldapsConnection() *ldap.Conn {
 	// TODO: verify TLS
 	// TLS, for testing purposes disable certificate verification, check https://golang.org/pkg/crypto/tls/#Config for further information.
-	tlsConfig := &tls.Config{InsecureSkipVerify: true}
+	tlsConfig := &tls.Config{ServerName: "ldaps-vip.cc.ic.ac.uk"}
 	l, err := ldap.DialTLS("tcp", fmt.Sprintf("%s:%d", "ldaps-vip.cc.ic.ac.uk", 636), tlsConfig)
 	if err != nil {
 		log.Fatal(err)
@@ -21,10 +21,10 @@ func ldapsConnection() *ldap.Conn {
 
 func search(l *ldap.Conn, accountName string) []*ldap.Entry {
 	searchRequest := ldap.NewSearchRequest(
-		"dc=ic,dc=ac,dc=uk", // The base dn to search
+		"dc=ic,dc=ac,dc=uk",
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		"(sAMAccountName=" + accountName + ")", // The filter to apply
-		[]string{"dn", "cn", "givenName", "sn"},                    // A list attributes to retrieve
+		"(sAMAccountName=" + accountName + ")",
+		[]string{"dn", "cn", "givenName", "sn", "memberOf"},
 		nil,
 	)
 
