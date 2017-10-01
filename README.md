@@ -18,3 +18,8 @@
  - `make build` to build the front-end assets for production
 
  - `make server` to start the go server
+ 
+## Example sponsor
+
+ - Email: `ada@sponsor.com`
+ - Password: `password`
