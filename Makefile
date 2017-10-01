@@ -20,14 +20,21 @@ seed:
 
 setup: install setupdb seed
 
-build:
+client:
 	cd client; yarn build
 
-build-dev:
+client-dev:
 	cd client; yarn build:dev
 
-client:
-	cd client; yarn && yarn start
+watch:
+	cd client; yarn start
 
 server:
-	go run web/*.go
+	go build -o sponsor-portal ./web
+
+run: server
+	./sponsor-portal
+
+.PHONY: install setupdb seed setup
+.PHONY: client client-dev watch
+.PHONY: server run
