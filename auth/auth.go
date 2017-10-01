@@ -52,7 +52,6 @@ var scopes = []string{oauthService.UserinfoEmailScope, oauthService.UserinfoProf
 const (
 	login    = "/login"
 	logout   = "/logout"
-	callback = "/callback"
 )
 
 type UserInfo struct {

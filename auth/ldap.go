@@ -47,6 +47,10 @@ func searchForName(l *ldap.Conn, accountName string) string {
 func isDoCSoc(l *ldap.Conn, accountName string) bool {
 	entries := search(l, accountName)
 
+	if len(entries) == 0 {
+		return false
+	}
+
 	return contains(entries[0].GetAttributeValues("memberOf"), "CN=zz-icu-docsoc-members-dl,OU=Distribution,OU=Groups,OU=Imperial College (London),DC=ic,DC=ac,DC=uk")
 }
 
