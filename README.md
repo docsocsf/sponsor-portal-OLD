@@ -13,12 +13,13 @@
  - `make install` to install npm and go packages
  - `docker-compose up -d` and `make setup` to start docker and migrate/seed the db
  
- - `make client` to build the front-end assets for development and watch for changes (recommended)
- - `make build-dev` to build the front-end assets for development
- - `make build` to build the front-end assets for production
+ - `make client` to build the front-end assets for production
+ - `make client-dev` to build the front-end assets for development
+ - `make watch` to build the front-end assets for development and watch for changes (recommended)
 
- - `make server` to start the go server
- 
+ - `make server` to build the server
+ - `make run` to start the server
+
 ## Example sponsor
 
  - Email: `ada@sponsor.com`
