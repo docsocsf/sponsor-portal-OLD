@@ -47,9 +47,9 @@ func (auth *BasicAuth) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	user, pass, ok := r.BasicAuth()
 
-	l := ldapsConnection()
-	defer l.Close()
-	userIsAuthenticated := userAuth(l, auth.username, auth.password, user, pass)
+	wrapper := &LDAPWrapper{}
+
+	userIsAuthenticated := wrapper.userAuth(auth.username, auth.password, user, pass)
 
 	if  !ok || !userIsAuthenticated {
 		w.Header().Set("WWW-Authenticate", `Basic realm="`+auth.realm+`"`)
@@ -58,7 +58,7 @@ func (auth *BasicAuth) handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ui := UserInfo{
-		Name: searchForName(l, user),
+		Name: wrapper.searchForName(user),
 		Email: user + "ic.ac.uk",
 	}
 
