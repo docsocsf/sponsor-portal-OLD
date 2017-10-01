@@ -8,6 +8,10 @@ import (
 )
 
 func ldapsConnection() *ldap.Conn {
+<<<<<<< HEAD
+=======
+	// TODO: verify TLS
+>>>>>>> 2ef659d8ef844227197daed19ea0d5e01d122aba
 	// TLS, for testing purposes disable certificate verification, check https://golang.org/pkg/crypto/tls/#Config for further information.
 	tlsConfig := &tls.Config{ServerName: "ldaps-vip.cc.ic.ac.uk"}
 	l, err := ldap.DialTLS("tcp", fmt.Sprintf("%s:%d", "ldaps-vip.cc.ic.ac.uk", 636), tlsConfig)
@@ -43,6 +47,7 @@ func searchForName(l *ldap.Conn, accountName string) string {
 
 	return firstName +" "+ surname
 }
+
 func isDoCSoc(l *ldap.Conn, accountName string) bool {
 	entries := search(l, accountName)
 

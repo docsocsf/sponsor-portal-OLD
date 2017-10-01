@@ -7,13 +7,17 @@ import (
 	"path"
 	"strings"
 
+	"github.com/docsocsf/sponsor-portal/auth"
 	"github.com/docsocsf/sponsor-portal/config"
 	"github.com/docsocsf/sponsor-portal/handlers"
 	"github.com/docsocsf/sponsor-portal/httputils"
 
 	"github.com/gorilla/mux"
 	_ "github.com/joho/godotenv/autoload"
+<<<<<<< HEAD
 	"github.com/docsocsf/sponsor-portal/auth"
+=======
+>>>>>>> 2ef659d8ef844227197daed19ea0d5e01d122aba
 )
 
 func main() {
