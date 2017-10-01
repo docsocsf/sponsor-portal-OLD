@@ -1,12 +1,9 @@
 package sponsor
 
 import (
-	"net/http"
-
 	"github.com/docsocsf/sponsor-portal/auth"
 	"github.com/docsocsf/sponsor-portal/config"
 	"github.com/docsocsf/sponsor-portal/model"
-	"github.com/gorilla/mux"
 )
 
 type Service struct {
@@ -45,8 +42,4 @@ func (s *Service) SetupDatabase(dbConfig config.Database) error {
 
 func (s *Service) SetupStorer(s3Config config.S3) {
 	s.s3 = model.NewS3(s3Config.Aws, s3Config.Bucket, s3Config.Prefix)
-}
-
-func (s *Service) Handle(r *mux.Router, web http.Handler) {
-	s.defineRoutes(r.PathPrefix("/sponsors").Subrouter(), web)
 }

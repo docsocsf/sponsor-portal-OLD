@@ -7,13 +7,14 @@ import (
 	"path"
 	"strings"
 
+	"github.com/docsocsf/sponsor-portal/auth"
 	"github.com/docsocsf/sponsor-portal/config"
-	"github.com/egnwd/roles"
-	"github.com/gorilla/handlers"
+	"github.com/docsocsf/sponsor-portal/handlers"
+	"github.com/docsocsf/sponsor-portal/httputils"
+	"github.com/docsocsf/sponsor-portal/sponsor"
+	"github.com/docsocsf/sponsor-portal/student"
 	"github.com/gorilla/mux"
 	_ "github.com/joho/godotenv/autoload"
-
-	"github.com/docsocsf/sponsor-portal/auth"
 )
 
 func main() {
@@ -23,22 +24,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	root := home(host.StaticFiles)
 	r := mux.NewRouter().StrictSlash(true)
 
-	student := makeStudentService(host.StaticFiles)
-	student.Handle(r, root)
+	studentService := makeStudentService(host.StaticFiles)
+	sponsorService := makeSponsorService(host.StaticFiles)
 
-	sponsor := makeSponsorService(host.StaticFiles)
-	sponsor.Handle(r, root)
-
-	r.Handle("/jwt/token", auth.RequireAuth(auth.GetToken(false), "/", roles.Anyone))
-	r.Handle("/jwt/onetime-token", auth.RequireAuth(auth.GetToken(true), "/", roles.Anyone))
+	r.PathPrefix("/api/").Handler(http.StripPrefix("/api", handlers.Api(studentService, sponsorService)))
+	r.PathPrefix("/auth/").Handler(http.StripPrefix("/auth", handlers.Auth(studentService, sponsorService)))
 
 	assets := http.FileServer(http.Dir(host.StaticFiles))
 	r.PathPrefix("/assets").Handler(assets)
-	r.Handle("/", root)
-	r.Handle("/login", auth.NoAuth(root, "/sponsors", "sponsor"))
+
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		httputils.Redirect(w, r, "/login")
+	})
+	r.Handle("/login", file(host.StaticFiles, "index.html"))
+	r.Handle("/students", auth.RequireAuth(file(host.StaticFiles, "students.html"), "/login", student.Role))
+	r.Handle("/sponsors", auth.RequireAuth(file(host.StaticFiles, "sponsors.html"), "/login", sponsor.Role))
 
 	log.Printf("Listening on %s...", host.Port)
 	log.Fatal(http.ListenAndServe(host.Port, handlers.LoggingHandler(os.Stdout, r)))
@@ -48,8 +50,8 @@ func rootMatcher(r *http.Request, rm *mux.RouteMatch) bool {
 	return r.URL.IsAbs() && !strings.HasPrefix(r.URL.Path, "/assets")
 }
 
-func home(static string) http.Handler {
+func file(static, filename string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, path.Join(static, "index.html"))
+		http.ServeFile(w, r, path.Join(static, filename))
 	})
 }

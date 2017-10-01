@@ -15,7 +15,7 @@ func makeSponsorService(staticFiles string) *sponsor.Service {
 	}
 
 	authConfig := &auth.Config{
-		BaseURL:      authEnvConfig.BaseURL,
+		BaseURL:      authEnvConfig.BaseURL + "/sponsors",
 		Issuer:       authEnvConfig.Issuer,
 		ClientID:     authEnvConfig.ClientID,
 		ClientSecret: authEnvConfig.ClientSecret,

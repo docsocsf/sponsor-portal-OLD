@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	oauthService "google.golang.org/api/oauth2/v2"
+	_ "github.com/joho/godotenv/autoload"
 
 	"github.com/docsocsf/sponsor-portal/config"
 )
@@ -66,7 +67,7 @@ var cookieJar *sessions.CookieStore
 func init() {
 	cookieConfig, err := config.GetAuth()
 	if err != nil {
-		log.Fatal("Could not gett cookie secret")
+		log.Fatal("Could not load config: ", err.Error())
 	}
 	cookieJar = sessions.NewCookieStore([]byte(cookieConfig.CookieSecret))
 }
