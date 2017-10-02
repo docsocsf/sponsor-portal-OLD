@@ -13,16 +13,17 @@ const (
 	ldapPort = 636
 	ldapConnPoolSize = 10
 	docsocDL = "CN=zz-icu-docsoc-members-dl,OU=Distribution,OU=Groups,OU=Imperial College (London),DC=ic,DC=ac,DC=uk"
-	domain = "@IC.AC.UK"
+	domain = "@ic.ac.uk"
 )
 
 const (
-	ldapUsernameAttribute = "sAMAccountName"
+	ldapUsernameAttribute  = "sAMAccountName"
 	ldapFirstNameAttribute = "givenName"
-	ldapSurnameAttribute = "sn"
-	ldapMemberOf = "memberOf"
-	ldapDomainComponent = "dn"
-	ldapCommonName = "cn"
+	ldapSurnameAttribute   = "sn"
+	ldapMemberOf           = "memberOf"
+	ldapDomainComponent    = "dn"
+	ldapCommonName         = "cn"
+	ldapBaseDN             = "dc=ic,dc=ac,dc=uk"
 )
 
 type InitFunction func() (interface{}, error)
@@ -100,10 +101,10 @@ func (wrapper *LDAPWrapper) search(accountName string) ([]*ldap.Entry, error) {
 	wrapper.bind(l)
 
 	searchRequest := ldap.NewSearchRequest(
-		"dc=ic,dc=ac,dc=uk", // The base dn to search
+		ldapBaseDN,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		"(" + ldapUsernameAttribute +"=" + accountName + ")", // The filter to apply
-		[]string{ldapDomainComponent, ldapCommonName, ldapFirstNameAttribute, ldapSurnameAttribute},                    // A list attributes to retrieve
+		"(" + ldapUsernameAttribute +"=" + accountName + ")",
+		[]string{ldapDomainComponent, ldapCommonName, ldapFirstNameAttribute, ldapSurnameAttribute},
 		nil,
 	)
 

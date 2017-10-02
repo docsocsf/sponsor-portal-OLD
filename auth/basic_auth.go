@@ -59,7 +59,7 @@ func (auth *BasicAuth) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	ui := UserInfo{
 		Name: wrapper.searchForName(user),
-		Email: user + "ic.ac.uk",
+		Email: user + domain,
 	}
 
 	id, err := auth.get(ui)
