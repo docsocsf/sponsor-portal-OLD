@@ -47,18 +47,35 @@ func (auth *BasicAuth) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	user, pass, ok := r.BasicAuth()
 
-	wrapper := &LDAPWrapper{}
+	wrapper := &LDAPWrapper{
+		username: auth.username,
+		password: auth.password,
+	}
 
-	userIsAuthenticated := wrapper.userAuth(auth.username, auth.password, user, pass)
-
-	if  !ok || !userIsAuthenticated {
+	userIsAuthenticated, err := wrapper.userAuth(user, pass)
+	if err != nil {
+		log.Println(err)
 		w.Header().Set("WWW-Authenticate", `Basic realm="`+auth.realm+`"`)
 		auth.failureHandler.ServeHTTP(w, r)
 		return
 	}
 
+	if  !ok || !userIsAuthenticated {
+		log.Println(err)
+		w.Header().Set("WWW-Authenticate", `Basic realm="`+auth.realm+`"`)
+		auth.failureHandler.ServeHTTP(w, r)
+		return
+	}
+
+	name, err := wrapper.searchForName(user)
+	if err != nil {
+		log.Println(err.Error())
+		auth.failureHandler.ServeHTTP(w, r)
+		return
+	}
+
 	ui := UserInfo{
-		Name: wrapper.searchForName(user),
+		Name: name,
 		Email: user + domain,
 	}
 

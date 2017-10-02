@@ -83,7 +83,7 @@ func (u userImpl) GetOrCreate(user User) (User, error) {
 	if err != nil {
 		if dbErr, ok := err.(DbError); ok && dbErr.NotFound {
 			log.Printf("%#v\n", u)
-			err := u.db.QueryRow(insertUser, user.Name, user.Auth.Email).Scan(user.Id)
+			err := u.db.QueryRow(insertUser, user.Name, user.Auth.Email).Scan(&user.Id)
 			if err != nil {
 				return User{}, err
 			}

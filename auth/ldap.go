@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"errors"
+	"github.com/davecgh/go-spew/spew"
 )
 
 const (
@@ -83,6 +84,7 @@ func (wrapper *LDAPWrapper) bind(l *ldap.Conn) error {
 	if err != nil {
 		return err
 	}
+	return nil
 }
 
 func ldapsConnection() (interface{}, error) {
@@ -104,7 +106,7 @@ func (wrapper *LDAPWrapper) search(accountName string) ([]*ldap.Entry, error) {
 		ldapBaseDN,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		"(" + ldapUsernameAttribute +"=" + accountName + ")",
-		[]string{ldapDomainComponent, ldapCommonName, ldapFirstNameAttribute, ldapSurnameAttribute},
+		[]string{ldapDomainComponent, ldapCommonName, ldapFirstNameAttribute, ldapSurnameAttribute, ldapMemberOf},
 		nil,
 	)
 
@@ -134,6 +136,8 @@ func (wrapper *LDAPWrapper) searchForName(accountName string) (string, error) {
 func (wrapper *LDAPWrapper) isDoCSoc(accountName string) (bool, error) {
 	entries, err := wrapper.search(accountName)
 
+	spew.Dump(entries)
+
 	if len(entries) == 0 {
 		return false, err
 	}
@@ -152,15 +156,11 @@ func contains(slice []string, item string) bool {
 	return ok
 }
 
-func (wrapper *LDAPWrapper) userAuth(serviceUsername string, servicePassword string, username string, password string) (bool, error) {
+func (wrapper *LDAPWrapper) userAuth(username string, password string) (bool, error) {
 	l := pool.GetConnection().(*ldap.Conn)
 	wrapper.bind(l)
 
-	// First bind with our service user
-	err := l.Bind(serviceUsername, servicePassword)
-	if err != nil {
-		log.Println(err)
-	}
+	log.Println("username: " + username)
 
 	if ok, _ := wrapper.isDoCSoc(username); !ok {
 		return false, errors.New("user is not a member of DoCSoc")
@@ -178,11 +178,11 @@ func (wrapper *LDAPWrapper) userAuth(serviceUsername string, servicePassword str
 		return false, err
 	}
 
-	// Rebind as the service user for any further queries
-	err = l.Bind(serviceUsername, servicePassword)
-	if err != nil {
-		return false, err
-	}
+	//// Rebind as the service user for any further queries
+	//err = l.Bind(serviceUsername, servicePassword)
+	//if err != nil {
+	//	return false, err
+	//}
 
 	pool.ReleaseConnection(l)
 
