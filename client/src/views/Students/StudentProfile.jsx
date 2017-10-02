@@ -3,6 +3,7 @@ import FileUploadDialog from 'Components/FileUploadDialog';
 import Header from 'Components/Header';
 import request from 'superagent';
 import { getJWTHeader } from '../../jwt';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 export default class StudentProfile extends React.Component {
   constructor() {
@@ -69,18 +70,32 @@ export default class StudentProfile extends React.Component {
       <div>
         <Header name={user && user.name} logout="/auth/students/logout"/>
         <div className="student-page">
-          <section id="profile">
-            <div id="cv">
-              <h2>{ cv && !upload ? "Your CV" : "Upload CV"}</h2>
-              <FileUploadDialog
-                accept="application/pdf"
-                className="cv"
-                multiple={false}
-                onUpload={this.uploadCV}
-                ref={n => this.fileRef = n}
-              />
-            </div>
-          </section>
+          <Tabs className="tabs underline">
+            <TabList>
+              <Tab>Profile</Tab>
+              <Tab>Sponsors</Tab>
+            </TabList>
+
+            <TabPanel>
+              <section id="profile">
+                <div id="cv">
+                  <h2>{ cv && !upload ? "Your CV" : "Upload CV"}</h2>
+                  <FileUploadDialog
+                    accept="application/pdf"
+                    className="cv"
+                    multiple={false}
+                    onUpload={this.uploadCV}
+                    ref={n => this.fileRef = n}
+                  />
+                </div>
+              </section>
+            </TabPanel>
+            <TabPanel>
+              <section id="sponsors">
+                <h2>Sponsors</h2>
+              </section>
+            </TabPanel>
+          </Tabs>
         </div>
       </div>
     );

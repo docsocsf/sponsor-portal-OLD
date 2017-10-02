@@ -39,18 +39,18 @@ export default class Login extends React.Component {
           <h1>
             DoCSoc<br/>Sponsor Portal
           </h1>
-          <Tabs>
+          <Tabs className="tabs filled">
             <TabList>
               <Tab>Student Login</Tab>
               <Tab>Sponsor Login</Tab>
             </TabList>
 
-            <TabPanel>
+            <TabPanel className="panel centered">
                 <button>
                   <a href="/students">Login with Imperial</a>
                 </button>
             </TabPanel>
-            <TabPanel>
+            <TabPanel className="panel centered">
               <LoginForm
                 onSubmit={this.onSubmit}
                 handleChange={this.handleChange}
