@@ -136,8 +136,6 @@ func (wrapper *LDAPWrapper) searchForName(accountName string) (string, error) {
 func (wrapper *LDAPWrapper) isDoCSoc(accountName string) (bool, error) {
 	entries, err := wrapper.search(accountName)
 
-	spew.Dump(entries)
-
 	if len(entries) == 0 {
 		return false, err
 	}
