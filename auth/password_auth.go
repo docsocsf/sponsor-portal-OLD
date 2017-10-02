@@ -38,7 +38,6 @@ func (auth *PasswordAuth) handleLogin(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 	ui := UserInfo{
-		Name: "Not Joe Bloggs",
 		Email: email,
 		Password: password,
 	}

@@ -26,17 +26,16 @@ const (
 	ldapBaseDN             = "dc=ic,dc=ac,dc=uk"
 )
 
-type InitFunction func() (interface{}, error)
+type InitFunction func() (*ldap.Conn, error)
 
 type ConnectionPoolWrapper struct {
-	size int
-	conn chan interface{}
+	conn chan *ldap.Conn
 }
 
 var pool = &ConnectionPoolWrapper{}
 
 func init() {
-	err := pool.InitPool(ldapConnPoolSize, ldapsConnection)
+	err := pool.InitPool(ldapConnPoolSize, createLdapsConnection)
 	if err != nil {
 		log.Fatal("LDAP connection pool couldn't be created")
 	}
@@ -50,7 +49,7 @@ func init() {
 */
 func (p *ConnectionPoolWrapper) InitPool(size int, initfn InitFunction) error {
 	// Create a buffered channel allowing size senders
-	p.conn = make(chan interface{}, size)
+	p.conn = make(chan *ldap.Conn, size)
 	for x := 0; x < size; x++ {
 		conn, err := initfn()
 		if err != nil {
@@ -60,15 +59,14 @@ func (p *ConnectionPoolWrapper) InitPool(size int, initfn InitFunction) error {
 		// If the init function succeeded, add the connection to the channel
 		p.conn <- conn
 	}
-	p.size = size
 	return nil
 }
 
-func (p *ConnectionPoolWrapper) GetConnection() interface{} {
+func (p *ConnectionPoolWrapper) GetConnection() *ldap.Conn {
 	return <-p.conn
 }
 
-func (p *ConnectionPoolWrapper) ReleaseConnection(conn interface{}) {
+func (p *ConnectionPoolWrapper) ReleaseConnection(conn *ldap.Conn) {
 	p.conn <- conn
 }
 
@@ -86,19 +84,16 @@ func (wrapper *LDAPWrapper) bind(l *ldap.Conn) error {
 	return nil
 }
 
-func ldapsConnection() (interface{}, error) {
+func createLdapsConnection() (*ldap.Conn, error) {
 	// TLS, check https://golang.org/pkg/crypto/tls/#Config for further information.
 	tlsConfig := &tls.Config{ServerName: ldapUrl}
 	l, err := ldap.DialTLS("tcp", fmt.Sprintf("%s:%d", ldapUrl, ldapPort), tlsConfig)
-	if err != nil {
-		return l, err
-	}
 
-	return l, nil
+	return l, err
 }
 
 func (wrapper *LDAPWrapper) search(accountName string) ([]*ldap.Entry, error) {
-	l := pool.GetConnection().(*ldap.Conn)
+	l := pool.GetConnection()
 	wrapper.bind(l)
 
 	searchRequest := ldap.NewSearchRequest(
@@ -135,8 +130,12 @@ func (wrapper *LDAPWrapper) searchForName(accountName string) (string, error) {
 func (wrapper *LDAPWrapper) isDoCSoc(accountName string) (bool, error) {
 	entries, err := wrapper.search(accountName)
 
-	if len(entries) == 0 {
+	if err != nil {
 		return false, err
+	}
+
+	if len(entries) == 0 {
+		return false, errors.New("user is not a member of DoCSoc")
 	}
 
 	return contains(entries[0].GetAttributeValues(ldapMemberOf), docsocDL), nil
@@ -154,34 +153,17 @@ func contains(slice []string, item string) bool {
 }
 
 func (wrapper *LDAPWrapper) userAuth(username string, password string) (bool, error) {
-	l := pool.GetConnection().(*ldap.Conn)
-	wrapper.bind(l)
-
-	log.Println("username: " + username)
-
-	if ok, _ := wrapper.isDoCSoc(username); !ok {
-		return false, errors.New("user is not a member of DoCSoc")
-	}
-
-	searchResult, err := wrapper.search(username)
-
-	if len(searchResult) != 1 {
-		return false, errors.New("user does not exist or too many entries returned")
-	}
+	l := pool.GetConnection()
 
 	// Bind as the user to verify their password
-	err = l.Bind(username + domain, password)
+	err := l.Bind(username + domain, password)
 	if err != nil {
 		return false, err
 	}
 
-	//// Rebind as the service user for any further queries
-	//err = l.Bind(serviceUsername, servicePassword)
-	//if err != nil {
-	//	return false, err
-	//}
+	ok, err := wrapper.isDoCSoc(username)
 
 	pool.ReleaseConnection(l)
 
-	return true, nil
+	return ok, err
 }
