@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"log"
+	"errors"
 )
 
 const (
@@ -12,6 +13,7 @@ const (
 	ldapPort = 636
 	ldapConnPoolSize = 10
 	docsocDL = "CN=zz-icu-docsoc-members-dl,OU=Distribution,OU=Groups,OU=Imperial College (London),DC=ic,DC=ac,DC=uk"
+	domain = "@IC.AC.UK"
 )
 
 const (
@@ -75,10 +77,10 @@ type LDAPWrapper struct {
 	password string
 }
 
-func (wrapper *LDAPWrapper) bind(l *ldap.Conn) {
+func (wrapper *LDAPWrapper) bind(l *ldap.Conn) error {
 	err := l.Bind(wrapper.username, wrapper.password)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 }
 
@@ -87,13 +89,13 @@ func ldapsConnection() (interface{}, error) {
 	tlsConfig := &tls.Config{ServerName: ldapUrl}
 	l, err := ldap.DialTLS("tcp", fmt.Sprintf("%s:%d", ldapUrl, ldapPort), tlsConfig)
 	if err != nil {
-		log.Fatal(err)
+		return l, err
 	}
 
 	return l, nil
 }
 
-func (wrapper *LDAPWrapper) search(accountName string) []*ldap.Entry {
+func (wrapper *LDAPWrapper) search(accountName string) ([]*ldap.Entry, error) {
 	l := pool.GetConnection().(*ldap.Conn)
 	wrapper.bind(l)
 
@@ -107,31 +109,35 @@ func (wrapper *LDAPWrapper) search(accountName string) []*ldap.Entry {
 
 	sr, err := l.Search(searchRequest)
 	if err != nil {
-		log.Fatal(err)
+		return []*ldap.Entry{}, err
 	}
 
 	pool.ReleaseConnection(l)
 
-	return sr.Entries
+	return sr.Entries, nil
 }
 
-func (wrapper *LDAPWrapper) searchForName(accountName string) string {
-	entries := wrapper.search(accountName)
+func (wrapper *LDAPWrapper) searchForName(accountName string) (string, error) {
+	entries, err := wrapper.search(accountName)
+
+	if err != nil {
+		return "", err
+	}
 
 	firstName := entries[0].GetAttributeValue(ldapFirstNameAttribute)
 	surname := entries[0].GetAttributeValue(ldapSurnameAttribute)
 
-	return firstName +" "+ surname
+	return firstName +" "+ surname, err
 }
 
-func (wrapper *LDAPWrapper) isDoCSoc(accountName string) bool {
-	entries := wrapper.search(accountName)
+func (wrapper *LDAPWrapper) isDoCSoc(accountName string) (bool, error) {
+	entries, err := wrapper.search(accountName)
 
 	if len(entries) == 0 {
-		return false
+		return false, err
 	}
 
-	return contains(entries[0].GetAttributeValues(ldapMemberOf), docsocDL)
+	return contains(entries[0].GetAttributeValues(ldapMemberOf), docsocDL), nil
 }
 
 // From: https://stackoverflow.com/a/27272103
@@ -145,42 +151,39 @@ func contains(slice []string, item string) bool {
 	return ok
 }
 
-// Example User Authentication shows how a typical application can verify a login attempt
-func (wrapper *LDAPWrapper) userAuth(serviceUsername string, servicePassword string, username string, password string) bool {
+func (wrapper *LDAPWrapper) userAuth(serviceUsername string, servicePassword string, username string, password string) (bool, error) {
 	l := pool.GetConnection().(*ldap.Conn)
 	wrapper.bind(l)
 
 	// First bind with our service user
 	err := l.Bind(serviceUsername, servicePassword)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
-	if !wrapper.isDoCSoc(username) {
-		log.Println("User is not a member of DoCSoc")
+	if ok, _ := wrapper.isDoCSoc(username); !ok {
+		return false, errors.New("user is not a member of DoCSoc")
 	}
 
-	searchResult := wrapper.search(username)
+	searchResult, err := wrapper.search(username)
 
 	if len(searchResult) != 1 {
-		fmt.Println("User does not exist or too many entries returned")
-		return false
+		return false, errors.New("user does not exist or too many entries returned")
 	}
 
 	// Bind as the user to verify their password
-	err = l.Bind(username + "@IC.AC.UK", password)
+	err = l.Bind(username + domain, password)
 	if err != nil {
-		fmt.Println(err)
-		return false
+		return false, err
 	}
 
 	// Rebind as the service user for any further queries
 	err = l.Bind(serviceUsername, servicePassword)
 	if err != nil {
-		fmt.Println(err)
-		return false
+		return false, err
 	}
+
 	pool.ReleaseConnection(l)
 
-	return true
+	return true, nil
 }
