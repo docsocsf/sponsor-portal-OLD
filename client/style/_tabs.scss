@@ -1,12 +1,10 @@
 .react-tabs, .tabs {
   margin-top: auto;
+  z-index: 1;
 
   >ul {
     margin: 0;
     padding: 0;
-
-    -webkit-transform: translateY(5px);
-    transform: translateY(5px);
 
     >li {
       transition-duration: .25s;
@@ -27,8 +25,8 @@
         top: 0;
         left: 0;
         background-color: rgba(255, 255, 255, .3);
-        -webkit-transform: translateY(100%);
-        transform: translateY(100%);
+        -webkit-transform: translatey(100%);
+        transform: translatey(100%);
         transition-duration: .25s;
         border-radius: 5px 5px 0 0;
       }
@@ -81,9 +79,63 @@
     }
   }
 
+  &.vertical >ul {
+    display: inline-block;
+    min-width: 220px;
+
+    >li {
+      text-align: left;
+      display: block;
+      padding: 0 0 0 15px;
+      margin: 5px 0;
+
+      &:before{
+        z-index: -1;
+        position: absolute;
+        content: "";
+        width: 8px;
+        height: 8px;
+        top: 50%;
+        left: 0;
+        margin-top: -4px;
+        background-color: lighten($background, 30%);
+        -webkit-transform: translateX(-10px);
+        transform: translateX(-10px);
+        transition-duration: .25s;
+        border-radius: 5px;
+      }
+
+      &:hover{
+        &:before{
+          -webkit-transform: translateX(0px);
+          transform: translateX(0px);
+        }
+      }
+
+      &.react-tabs__tab--selected{
+        &:before{
+          background-color: $background;
+          -webkit-transform: translateX(0px);
+          transform: translateX(0px);
+        }
+      }
+    }
+  }
+
   &.filled .react-tabs__tab-panel,
   &.filled .panel {
     background: #fff;
+  }
+
+  &.vertical {
+    display: flex;
+
+    .panel, .react-tabs__tab-panel {
+      &.react-tabs__tab-panel--selected {
+        display: inline-block;
+        flex-grow: 1;
+      }
+    }
   }
 
   .panel, .react-tabs__tab-panel {

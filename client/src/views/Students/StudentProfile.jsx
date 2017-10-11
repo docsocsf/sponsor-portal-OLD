@@ -1,37 +1,36 @@
 import React from 'react';
 import FileUploadDialog from 'Components/FileUploadDialog';
 import Header from 'Components/Header';
+import SponsorPanel from './panels/SponsorPanel';
 import request from 'superagent';
 import { getJWTHeader } from '../../jwt';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { fetchUser, fetchCV } from './actions';
 
 export default class StudentProfile extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
 
     this.state = {}
-    this.getUser = this.getUser.bind(this);
-    this.getCV = this.getCV.bind(this);
-    this.uploadCV = this.uploadCV.bind(this);
   }
 
-  async componentDidMount() {
+  componentDidMount = async () => {
     await this.getUser()
-    this.getCV()
+    await this.getCV()
   }
 
-  async getUser() {
+  getUser = async () => {
     try {
-      const user = await this.props.fetchUser()
+      const user = await fetchUser()
       this.setState({user})
     } catch (e) {
       console.log("fetch user", e)
     }
   }
 
-  async getCV() {
+  getCV = async () => {
     try {
-      const cv = await this.props.fetchCV()
+      const cv = await fetchCV()
       if (!cv) return
       this.setState({cv, upload: false})
       this.fileRef.updateFile([cv])
@@ -40,7 +39,7 @@ export default class StudentProfile extends React.Component {
     }
   }
 
-  async uploadCV(files, progress) {
+  uploadCV = async (files, progress) => {
     if (files.length > 1) {
       throw new Error("Expecting exactly 1 CV")
     }
@@ -84,6 +83,7 @@ export default class StudentProfile extends React.Component {
                     accept="application/pdf"
                     className="cv"
                     multiple={false}
+                    files={cv ? [cv] : []}
                     onUpload={this.uploadCV}
                     ref={n => this.fileRef = n}
                   />
@@ -91,9 +91,7 @@ export default class StudentProfile extends React.Component {
               </section>
             </TabPanel>
             <TabPanel>
-              <section id="sponsors">
-                <h2>Sponsors</h2>
-              </section>
+              <SponsorPanel />
             </TabPanel>
           </Tabs>
         </div>

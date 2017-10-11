@@ -2,6 +2,8 @@
 @import 'forms';
 @import 'table-overrides';
 @import 'tabs';
+@import 'accordion';
+@import 'icons';
 
 html, body {
   height: 100%;
@@ -84,3 +86,9 @@ header {
   font-size: 2rem;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  &.inline {
+    display: inline;
+    vertical-align: middle;
+  }
+}
