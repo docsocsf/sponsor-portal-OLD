@@ -1,11 +1,12 @@
 package auth
 
 import (
-	"net/http"
-	"github.com/gorilla/sessions"
-	"github.com/gorilla/mux"
-	"github.com/docsocsf/sponsor-portal/config"
 	"log"
+	"net/http"
+
+	"github.com/docsocsf/sponsor-portal/config"
+	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 )
 
 func NewBasicAuth(conf *Config) (*BasicAuth, error) {
@@ -13,10 +14,9 @@ func NewBasicAuth(conf *Config) (*BasicAuth, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	auth := &BasicAuth{
-		auth: newAuth(conf),
-		username: basicAuthConfig.ServiceUsername,
-		password: basicAuthConfig.ServicePassword,
+		auth:  newAuth(conf),
 		realm: basicAuthConfig.Realm,
 	}
 
@@ -45,38 +45,14 @@ func (auth *BasicAuth) Handler() http.Handler {
 // Inspired by: https://stackoverflow.com/a/39591234
 func (auth *BasicAuth) handleLogin(w http.ResponseWriter, r *http.Request) {
 
-	user, pass, ok := r.BasicAuth()
+	user, pass, _ := r.BasicAuth()
 
-	wrapper := &LDAPWrapper{
-		username: auth.username,
-		password: auth.password,
-	}
-
-	userIsAuthenticated, err := wrapper.userAuth(user, pass)
-	if err != nil {
-		log.Println(err)
-		w.Header().Set("WWW-Authenticate", `Basic realm="`+auth.realm+`"`)
-		auth.failureHandler.ServeHTTP(w, r)
-		return
-	}
-
-	if  !ok || !userIsAuthenticated {
-		log.Println(err)
-		w.Header().Set("WWW-Authenticate", `Basic realm="`+auth.realm+`"`)
-		auth.failureHandler.ServeHTTP(w, r)
-		return
-	}
-
-	name, err := wrapper.searchForName(user)
+	ui, err := userAuth(user, pass)
 	if err != nil {
 		log.Println(err.Error())
+		w.Header().Set("WWW-Authenticate", `Basic realm="`+auth.realm+`"`)
 		auth.failureHandler.ServeHTTP(w, r)
 		return
-	}
-
-	ui := UserInfo{
-		Name: name,
-		Email: user + domain,
 	}
 
 	id, err := auth.get(ui)

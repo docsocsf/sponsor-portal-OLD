@@ -41,8 +41,6 @@ type auth struct {
 type PasswordAuth = auth
 type BasicAuth struct {
 	auth
-	username string
-	password string
 	realm string
 }
 

@@ -12,8 +12,6 @@ type Auth struct {
 }
 
 type BasicAuth struct {
-	ServiceUsername string `env:"SERVICE_USER_NAME,required"`
-	ServicePassword string `env:"SERVICE_PASSWORD,required"`
 	Realm string `env:"REALM,required"`
 }
 
