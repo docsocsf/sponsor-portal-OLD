@@ -21,23 +21,13 @@
         position: absolute;
         content: "";
         width: 100%;
-        height: 120%;
-        top: 0;
+        height: 15%;
+        bottom: -20%;
         left: 0;
         background-color: rgba(255, 255, 255, .3);
-        -webkit-transform: translatey(100%);
-        transform: translatey(100%);
         transition-duration: .25s;
         border-radius: 5px 5px 0 0;
       }
-
-      &:hover{
-        &:before{
-          -webkit-transform: translateY(70%);
-          transform: translateY(70%);
-        }
-      }
-
     }
   }
 
@@ -49,17 +39,15 @@
 
     &:hover{
       &:before{
-        -webkit-transform: translateY(75%);
-        transform: translateY(75%);
+        bottom: 0;
       }
     }
 
     margin: 0 5px;
     &.react-tabs__tab--selected{
       &:before{
-        -webkit-transform: translateY(75%);
-        transform: translateY(75%);
         background-color: $background;
+        bottom: 0;
       }
     }
   }
@@ -67,14 +55,18 @@
   &.filled >ul >li {
     color: white;
 
+    &:before {
+      height: 120%;
+      top: 85%;
+    }
+
     &.react-tabs__tab--selected{
       color: rgb(80, 85, 90);
 
       &:before{
         transition-duration: .5s;
         background-color: white;
-        -webkit-transform: translateY(0);
-        transform: translateY(0);
+        top: 0;
       }
     }
   }
@@ -96,27 +88,22 @@
         width: 8px;
         height: 8px;
         top: 50%;
-        left: 0;
+        left: -10px;
         margin-top: -4px;
         background-color: lighten($background, 30%);
-        -webkit-transform: translateX(-10px);
-        transform: translateX(-10px);
-        transition-duration: .25s;
         border-radius: 5px;
       }
 
       &:hover{
         &:before{
-          -webkit-transform: translateX(0px);
-          transform: translateX(0px);
+          left: 0px;
         }
       }
 
       &.react-tabs__tab--selected{
         &:before{
           background-color: $background;
-          -webkit-transform: translateX(0px);
-          transform: translateX(0px);
+          left: 0px;
         }
       }
     }
