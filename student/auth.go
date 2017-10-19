@@ -36,8 +36,7 @@ func (s *Service) setupAuth(config *auth.Config) (err error) {
 }
 
 func (s *Service) authHandler(info auth.UserInfo) (*auth.UserIdentifier, error) {
-	// TODO: add in name from LDAP here
-	userModel := model.User {
+	userModel := model.User{
 		Name: info.Name,
 		Auth: &model.UserAuth{
 			Email: info.Email,

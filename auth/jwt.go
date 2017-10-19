@@ -111,7 +111,6 @@ func jwtHandler(inner http.Handler, auth Auth, onetime bool, validRoles ...strin
 			return
 		}
 
-		log.Println("Checking claims")
 		if claims, ok := token.Claims.(*Claims); ok {
 			if !roles.HasRole(r, &claims.UserIdentifier, validRoles...) {
 				http.Error(w, "Invalid access", http.StatusUnauthorized)
@@ -135,7 +134,6 @@ func extractToken(r *http.Request, onetime bool) (*jwt.Token, error) {
 	var tokenStr string
 	if onetime {
 		tokenStr = r.FormValue("token")
-		log.Println(tokenStr)
 	} else {
 		tokenStr = strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
 	}
