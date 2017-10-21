@@ -1,7 +1,8 @@
 node_modules
 *~
 
-client/dist/assets
+client/dist/assets/*
+!client/dist/assets/images
 vendor
 /sponsor-portal
 

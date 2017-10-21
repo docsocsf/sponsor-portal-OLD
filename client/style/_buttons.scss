@@ -1,13 +1,13 @@
 @import 'colors';
 
-button {
+button, input[type="submit"] {
   -webkit-appearance: none;
   border: none;
   outline: none;
 
   background: $background;
-  padding: 6px 10px;
-  margin: 0 5px;
+  padding: 0.4em 1em;
+  margin: 5px;
   color: whitesmoke;
 
   a {
@@ -27,6 +27,7 @@ button {
 
   &:hover {
     background: darken($background, 7%);
+    color: darken(whitesmoke, 10%);
     a {
       color: darken(whitesmoke, 10%);
     }
