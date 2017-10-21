@@ -1,0 +1,22 @@
+.accordion {
+
+  nav {
+    display: inline-block;
+  }
+
+  main {
+    display: inline-block;
+  }
+
+  .title {
+    cursor: pointer;
+  }
+
+  .content {
+    display: none;
+
+    &.active {
+      display: block;
+    }
+  }
+}

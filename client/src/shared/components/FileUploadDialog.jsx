@@ -13,7 +13,9 @@ const initialState = {
 export default class FileUploadDialog extends React.Component {
   constructor(props) {
     super(props)
-    this.state = initialState;
+
+    const files = props.files;
+    this.state = files ? {...initialState, files} : initialState;
     this.getState = this.getState.bind(this);
     this.fileUpload = this.fileUpload.bind(this);
     this.updateFile = this.updateFile.bind(this);

@@ -1,0 +1,142 @@
+.react-tabs, .tabs {
+  margin-top: auto;
+  z-index: 1;
+
+  >ul {
+    margin: 0;
+    padding: 0;
+
+    >li {
+      transition-duration: .25s;
+      display: inline-block;
+      list-style: none;
+      text-align: center;
+      padding: 15px 15px 20px 15px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+
+      &:before{
+        z-index: -1;
+        position: absolute;
+        content: "";
+        width: 100%;
+        height: 15%;
+        bottom: -20%;
+        left: 0;
+        background-color: rgba(255, 255, 255, .3);
+        transition-duration: .25s;
+        border-radius: 5px 5px 0 0;
+      }
+    }
+  }
+
+  &.underline >ul >li {
+
+    &:before {
+        background-color: lighten($background, 30%);
+    }
+
+    &:hover{
+      &:before{
+        bottom: 0;
+      }
+    }
+
+    margin: 0 5px;
+    &.react-tabs__tab--selected{
+      &:before{
+        background-color: $background;
+        bottom: 0;
+      }
+    }
+  }
+
+  &.filled >ul >li {
+    color: white;
+
+    &:before {
+      height: 120%;
+      top: 85%;
+    }
+
+    &.react-tabs__tab--selected{
+      color: rgb(80, 85, 90);
+
+      &:before{
+        transition-duration: .5s;
+        background-color: white;
+        top: 0;
+      }
+    }
+  }
+
+  &.vertical >ul {
+    display: inline-block;
+    min-width: 220px;
+
+    >li {
+      text-align: left;
+      display: block;
+      padding: 0 0 0 15px;
+      margin: 5px 0;
+
+      &:before{
+        z-index: -1;
+        position: absolute;
+        content: "";
+        width: 8px;
+        height: 8px;
+        top: 50%;
+        left: -10px;
+        margin-top: -4px;
+        background-color: lighten($background, 30%);
+        border-radius: 5px;
+      }
+
+      &:hover{
+        &:before{
+          left: 0px;
+        }
+      }
+
+      &.react-tabs__tab--selected{
+        &:before{
+          background-color: $background;
+          left: 0px;
+        }
+      }
+    }
+  }
+
+  &.filled .react-tabs__tab-panel,
+  &.filled .panel {
+    background: #fff;
+  }
+
+  &.vertical {
+    display: flex;
+
+    .panel, .react-tabs__tab-panel {
+      &.react-tabs__tab-panel--selected {
+        display: inline-block;
+        flex-grow: 1;
+      }
+    }
+  }
+
+  .panel, .react-tabs__tab-panel {
+    padding: 10px;
+    display: none;
+    min-height: 120px;
+
+    &.react-tabs__tab-panel--selected {
+      display: flex;
+
+      &.centered {
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  }
+}

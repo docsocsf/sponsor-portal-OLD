@@ -1,8 +1,18 @@
 @import 'colors';
 @import 'forms';
+@import 'table-overrides';
+@import 'tabs';
+@import 'accordion';
+@import 'icons';
 
 html, body {
   height: 100%;
+}
+
+* {
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility:    hidden;
+  -ms-backface-visibility:     hidden;
 }
 
 body {
@@ -20,15 +30,9 @@ body {
     }
 }
 
-header {
-  max-width: 680px;
-  background-color: $background;
-  color: white;
+.container {
   padding: 20px;
-  text-align: center;
-  margin: 0 auto 40px;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
+  position: relative;
 }
 
 h2 {
@@ -46,4 +50,51 @@ a {
 
 p a {
   text-decoration: underline;
+}
+
+header {
+  width: 100%;
+  background-color: $background;
+  color: white;
+
+  a {
+    color: white;
+
+    &:hover {
+      color: lighten($background, 20%);
+    }
+  }
+
+  .logos {
+    display: inline-block;
+
+    * {
+      vertical-align: middle;
+    }
+
+    .user-name {
+      margin-left: 10px;
+    }
+  }
+
+  .menu {
+    display: inline-block;
+    float: right;
+    height: 30px;
+
+    * {
+      vertical-align: middle;
+    }
+  }
+}
+
+.big-text {
+  font-size: 2rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  &.inline {
+    display: inline;
+    vertical-align: middle;
+  }
 }
