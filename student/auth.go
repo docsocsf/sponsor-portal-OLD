@@ -30,7 +30,7 @@ func (s *Service) setupAuth(config *auth.Config) (err error) {
 		config.PostLogoutHandler = http.HandlerFunc(s.authPostLogoutHandler)
 	}
 
-	s.Auth, err = auth.NewOAuth(config)
+	s.Auth, err = auth.NewBasicAuth(config)
 
 	return
 }
@@ -43,7 +43,7 @@ func (s *Service) authHandler(info auth.UserInfo) (*auth.UserIdentifier, error) 
 		},
 	}
 
-	user, err := s.UserReader.Get(userModel)
+	user, err := s.UserReader.GetOrCreate(userModel)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (s *Service) authSuccessHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) authFailureHandler(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Authentication failure", http.StatusForbidden)
+	http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 }
 
 func (s *Service) authPostLogoutHandler(w http.ResponseWriter, r *http.Request) {

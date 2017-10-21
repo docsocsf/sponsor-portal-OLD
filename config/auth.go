@@ -2,20 +2,25 @@ package config
 
 import "github.com/caarlos0/env"
 
-type OAuth struct {
-	CookieSecret string `env:"OAUTH_COOKIE_SECRET,required"`
+type Auth struct {
+	CookieSecret string `env:"AUTH_COOKIE_SECRET,required"`
 
-	BaseURL string `env:"OAUTH_BASE_URL"`
-	Issuer  string `env:"OAUTH_ISSUER"`
-
-	ClientID     string `env:"OAUTH_CLIENT_ID,required"`
-	ClientSecret string `env:"OAUTH_CLIENT_SECRET,required"`
+	BaseURL string `env:"AUTH_BASE_URL"`
 
 	JwtSecret string `env:"JWT_SECRET,required"`
 	JwtIssuer string `env:"JWT_ISSUER,required"`
 }
 
-func GetAuth() (auth OAuth, err error) {
+type BasicAuth struct {
+	Realm string `env:"REALM,required"`
+}
+
+func GetAuth() (auth Auth, err error) {
+	err = env.Parse(&auth)
+	return
+}
+
+func GetBasicAuth() (auth BasicAuth, err error) {
 	err = env.Parse(&auth)
 	return
 }

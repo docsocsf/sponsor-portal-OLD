@@ -9,3 +9,5 @@ import:
 - package: google.golang.org/api
 - package: github.com/egnwd/roles
   version: ^1.0.1
+- package: gopkg.in/ldap.v2
+  version: ^2.5.0

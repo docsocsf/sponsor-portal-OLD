@@ -21,6 +21,6 @@ func Auth(students *student.Service, sponsors *sponsor.Service) http.Handler {
 func getJwt(w http.ResponseWriter, r *http.Request) {
 	vs, ok := r.URL.Query()["single"]
 	single := ok && len(vs) > 0
-	h := auth.RequireAuth(auth.GetToken(single), "/", roles.Anyone)
+	h := auth.RequireAuth(auth.GetToken(single), "", roles.Anyone)
 	h.ServeHTTP(w, r)
 }

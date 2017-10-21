@@ -15,7 +15,6 @@ func NewPasswordAuth(config *Config) (*PasswordAuth, error) {
 	router := mux.NewRouter()
 
 	router.HandleFunc(login, auth.handleLogin).Methods(http.MethodPost)
-	router.HandleFunc(callback, auth.handleCallback)
 	router.HandleFunc(logout, auth.handleLogout)
 
 	auth.router = router
@@ -39,10 +38,8 @@ func (auth *PasswordAuth) handleLogin(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 	ui := UserInfo{
-		&UserInfoPlus{
-			Email: email,
-		},
-		password,
+		Email: email,
+		Password: password,
 	}
 
 	id, err := auth.get(ui)
@@ -70,8 +67,4 @@ func (auth *PasswordAuth) handleLogout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	auth.postLogoutHandler.ServeHTTP(w, r)
-}
-
-func (auth *PasswordAuth) handleCallback(w http.ResponseWriter, r *http.Request) {
-	// To fullfill interface (TODO rethink if needed)
 }
