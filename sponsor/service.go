@@ -16,14 +16,11 @@ type Service struct {
 	model.CVReader
 }
 
-func New(authConfig *auth.Config, staticFiles string) (*Service, error) {
+func New(staticFiles string) (*Service, error) {
 	service := Service{
 		staticFiles: staticFiles,
 	}
-
-	if err := service.setupAuth(authConfig); err != nil {
-		return nil, err
-	}
+	service.setupAuth()
 
 	return &service, nil
 }

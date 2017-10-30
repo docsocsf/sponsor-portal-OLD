@@ -8,8 +8,14 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-func NewPasswordAuth(config *Config) (*PasswordAuth, error) {
-	a := newAuth(config)
+type PasswordAuth struct {
+	commonAuth
+}
+
+func NewPasswordAuth(config *Config) *PasswordAuth {
+	a := PasswordAuth{
+		newAuth(config),
+	}
 	auth := &a
 
 	router := mux.NewRouter()
@@ -19,11 +25,7 @@ func NewPasswordAuth(config *Config) (*PasswordAuth, error) {
 
 	auth.router = router
 
-	return auth, nil
-}
-
-func (auth *PasswordAuth) baseUrl() string {
-	return auth.baseURL
+	return auth
 }
 
 func (auth *PasswordAuth) session(r *http.Request, sessionKey string) (*sessions.Session, error) {
@@ -38,7 +40,7 @@ func (auth *PasswordAuth) handleLogin(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 	ui := UserInfo{
-		Email: email,
+		Email:    email,
 		Password: password,
 	}
 

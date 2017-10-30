@@ -20,22 +20,7 @@ type Claims struct {
 	UserIdentifier
 }
 
-var (
-	issuer string
-	secret []byte
-)
-
 const jtiKey = "jti"
-
-func init() {
-	authEnvConfig, err := config.GetAuth()
-	if err != nil {
-		log.Fatal(err, "Make jwt service")
-	}
-
-	issuer = authEnvConfig.JwtIssuer
-	secret = []byte(authEnvConfig.JwtSecret)
-}
 
 func verifyId(jti string, cmp string, required bool) bool {
 	if jti == "" {
@@ -45,6 +30,11 @@ func verifyId(jti string, cmp string, required bool) bool {
 }
 
 func GetToken(onetime bool) http.Handler {
+	authEnvConfig, err := config.GetAuth()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user := User(r)
 		if user == nil {
@@ -53,7 +43,7 @@ func GetToken(onetime bool) http.Handler {
 		}
 		claims := Claims{
 			jwt.StandardClaims{
-				Issuer:    issuer,
+				Issuer:    authEnvConfig.JwtIssuer,
 				ExpiresAt: getExpiry(),
 			},
 			*user,
@@ -75,7 +65,7 @@ func GetToken(onetime bool) http.Handler {
 		}
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-		json, err := token.SignedString(secret)
+		json, err := token.SignedString(authEnvConfig.JwtSecret)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -131,6 +121,11 @@ func jwtHandler(inner http.Handler, auth Auth, onetime bool, validRoles ...strin
 }
 
 func extractToken(r *http.Request, onetime bool) (*jwt.Token, error) {
+	authEnvConfig, err := config.GetAuth()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var tokenStr string
 	if onetime {
 		tokenStr = r.FormValue("token")
@@ -142,7 +137,7 @@ func extractToken(r *http.Request, onetime bool) (*jwt.Token, error) {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return secret, nil
+		return authEnvConfig.JwtSecret, nil
 	})
 }
 

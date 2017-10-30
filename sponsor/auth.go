@@ -16,24 +16,15 @@ func init() {
 	roles.Register(Role, auth.RoleChecker(Role))
 }
 
-func (s *Service) setupAuth(config *auth.Config) (err error) {
-	if config.Get == nil {
-		config.Get = s.authHandler
+func (s *Service) setupAuth() auth.Auth {
+	handlers := &auth.Config{
+		Get:               s.authHandler,
+		SuccessHandler:    http.HandlerFunc(s.authSuccessHandler),
+		FailureHandler:    http.HandlerFunc(s.authFailureHandler),
+		PostLogoutHandler: http.HandlerFunc(s.authPostLogoutHandler),
 	}
 
-	if config.SuccessHandler == nil {
-		config.SuccessHandler = http.HandlerFunc(s.authSuccessHandler)
-	}
-	if config.FailureHandler == nil {
-		config.FailureHandler = http.HandlerFunc(s.authFailureHandler)
-	}
-	if config.PostLogoutHandler == nil {
-		config.PostLogoutHandler = http.HandlerFunc(s.authPostLogoutHandler)
-	}
-
-	s.Auth, err = auth.NewPasswordAuth(config)
-
-	return
+	return auth.NewPasswordAuth(handlers)
 }
 
 func (s *Service) authHandler(info auth.UserInfo) (*auth.UserIdentifier, error) {

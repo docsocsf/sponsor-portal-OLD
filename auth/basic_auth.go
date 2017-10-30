@@ -9,15 +9,20 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-func NewBasicAuth(conf *Config) (*BasicAuth, error) {
+type BasicAuth struct {
+	commonAuth
+	realm string
+}
+
+func NewBasicAuth(conf *Config) *BasicAuth {
 	basicAuthConfig, err := config.GetBasicAuth()
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 
 	auth := &BasicAuth{
-		auth:  newAuth(conf),
-		realm: basicAuthConfig.Realm,
+		commonAuth: newAuth(conf),
+		realm:      basicAuthConfig.Realm,
 	}
 
 	router := mux.NewRouter()
@@ -27,11 +32,7 @@ func NewBasicAuth(conf *Config) (*BasicAuth, error) {
 
 	auth.router = router
 
-	return auth, nil
-}
-
-func (auth *BasicAuth) baseUrl() string {
-	return auth.baseURL
+	return auth
 }
 
 func (auth *BasicAuth) session(r *http.Request, sessionKey string) (*sessions.Session, error) {
@@ -44,7 +45,6 @@ func (auth *BasicAuth) Handler() http.Handler {
 
 // Inspired by: https://stackoverflow.com/a/39591234
 func (auth *BasicAuth) handleLogin(w http.ResponseWriter, r *http.Request) {
-
 	user, pass, _ := r.BasicAuth()
 
 	ui, err := userAuth(user, pass)

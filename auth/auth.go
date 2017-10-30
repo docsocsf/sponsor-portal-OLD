@@ -9,7 +9,6 @@ import (
 	"github.com/egnwd/roles"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	oauthService "google.golang.org/api/oauth2/v2"
 	_ "github.com/joho/godotenv/autoload"
 
 	"github.com/docsocsf/sponsor-portal/config"
@@ -18,18 +17,14 @@ import (
 type Auth interface {
 	//Handlers
 	Handler() http.Handler
-	handleLogin(w http.ResponseWriter, r *http.Request)
-	handleLogout(w http.ResponseWriter, r *http.Request)
 
-	baseUrl() string
 	session(r *http.Request, sessionKey string) (*sessions.Session, error)
 }
 
-type auth struct {
+type commonAuth struct {
 	router *mux.Router
 
-	store   *sessions.CookieStore
-	baseURL string
+	store *sessions.CookieStore
 
 	get func(info UserInfo) (*UserIdentifier, error)
 
@@ -38,46 +33,34 @@ type auth struct {
 	postLogoutHandler http.Handler
 }
 
-type PasswordAuth = auth
-type BasicAuth struct {
-	auth
-	realm string
-}
-
-
-var scopes = []string{oauthService.UserinfoEmailScope, oauthService.UserinfoProfileScope}
-
 const (
-	login    = "/login"
-	logout   = "/logout"
+	login  = "/login"
+	logout = "/logout"
 )
 
 type UserInfo struct {
-	Name string
-	Email string
+	Name     string
+	Email    string
 	Password string
 }
 
 var cookieJar *sessions.CookieStore
 
-func init() {
+func newAuth(handlers *Config) commonAuth {
 	cookieConfig, err := config.GetAuth()
 	if err != nil {
 		log.Fatal("Could not load config: ", err.Error())
 	}
-	cookieJar = sessions.NewCookieStore([]byte(cookieConfig.CookieSecret))
-}
 
-func newAuth(config *Config) auth {
-	return auth{
-		store:   cookieJar,
-		baseURL: config.BaseURL,
+	cookieJar := sessions.NewCookieStore([]byte(cookieConfig.CookieSecret))
+	return commonAuth{
+		store: cookieJar,
 
-		get: config.Get,
+		get: handlers.Get,
 
-		successHandler:    config.SuccessHandler,
-		failureHandler:    config.FailureHandler,
-		postLogoutHandler: config.PostLogoutHandler,
+		successHandler:    handlers.SuccessHandler,
+		failureHandler:    handlers.FailureHandler,
+		postLogoutHandler: handlers.PostLogoutHandler,
 	}
 }
 
